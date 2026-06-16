@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OMC 2026 — Registration</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy: #1a2640;
+      --navy-light: #2b3d5c;
+      --gold: #c9a84c;
+      --gold-light: #e8c97a;
+      --cream: #faf8f4;
+      --white: #ffffff;
+      --muted: #6b7280;
+      --border: #e5e0d8;
+      --radius: 8px;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--cream);
+      color: var(--navy);
+      min-height: 100vh;
+    }
+
+    /* Header */
+    .site-header {
+      background: var(--navy);
+      padding: 1.25rem 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .site-header img {
+      height: 36px;
+      width: auto;
+      filter: brightness(0) invert(1);
+      opacity: 0.9;
+    }
+    .site-header .org-name {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 400;
+      color: rgba(255,255,255,0.7);
+      letter-spacing: 0.06em;
+    }
+
+    /* Hero banner */
+    .hero {
+      background: var(--navy);
+      padding: 3.5rem 2rem 3rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 0%, rgba(201,168,76,0.12) 0%, transparent 65%);
+      pointer-events: none;
+    }
+    .hero-eyebrow {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.75rem;
+    }
+    .hero h1 {
+      font-family: 'Lora', serif;
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 500;
+      color: var(--white);
+      line-height: 1.15;
+      margin-bottom: 0.75rem;
+    }
+    .hero-sub {
+      font-size: 14px;
+      color: rgba(255,255,255,0.55);
+      max-width: 420px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+    .hero-divider {
+      width: 36px;
+      height: 1px;
+      background: var(--gold);
+      margin: 1.5rem auto 0;
+      opacity: 0.6;
+    }
+
+    /* Form container */
+    .page-wrap {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem 4rem;
+    }
+
+    .card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+      margin-bottom: 1.25rem;
+    }
+    .card-title {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1.25rem;
+    }
+
+    /* Fields */
+    .field { margin-bottom: 1.1rem; }
+    .field:last-child { margin-bottom: 0; }
+    .field label {
+      display: block;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 5px;
+    }
+    .field input,
+    .field select,
+    .field textarea {
+      width: 100%;
+      padding: 10px 13px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      color: var(--navy);
+      background: var(--cream);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      appearance: none;
+    }
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus {
+      border-color: var(--navy-light);
+      box-shadow: 0 0 0 3px rgba(26,38,64,0.08);
+      background: var(--white);
+    }
+    .field textarea { resize: vertical; min-height: 72px; line-height: 1.6; }
+    .field select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7280' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 36px;
+      cursor: pointer;
+    }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 480px) { .row { grid-template-columns: 1fr; } }
+
+    /* Ticket options */
+    .ticket-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    @media (max-width: 480px) { .ticket-grid { grid-template-columns: 1fr; } }
+    .ticket {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 13px 14px;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+      background: var(--cream);
+    }
+    .ticket:hover { border-color: var(--navy-light); }
+    .ticket.selected {
+      border-color: var(--navy);
+      background: var(--white);
+      box-shadow: inset 0 0 0 1px var(--navy);
+    }
+    .ticket input { display: none; }
+    .ticket .t-name { font-size: 13px; font-weight: 500; color: var(--navy); }
+    .ticket .t-price { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .ticket .t-badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      background: var(--gold-light);
+      color: #7a5a00;
+      padding: 2px 7px;
+      border-radius: 4px;
+      margin-top: 5px;
+    }
+
+    /* Checkboxes */
+    .check-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 0.75rem;
+    }
+    .check-row:last-child { margin-bottom: 0; }
+    .check-row input[type=checkbox] {
+      width: 16px; height: 16px;
+      margin-top: 2px;
+      flex-shrink: 0;
+      accent-color: var(--navy);
+      cursor: pointer;
+    }
+    .check-row span {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+    .check-row a { color: var(--navy); }
+
+    /* Submit */
+    .submit-area { margin-top: 1.5rem; }
+    .submit-btn {
+      width: 100%;
+      padding: 13px;
+      background: var(--navy);
+      color: var(--white);
+      border: none;
+      border-radius: var(--radius);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 0.03em;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+    }
+    .submit-btn:hover { background: var(--navy-light); }
+    .submit-btn:active { transform: scale(0.99); }
+    .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .submit-note {
+      text-align: center;
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 0.75rem;
+      line-height: 1.5;
+    }
+
+    /* Error / success states */
+    .field-error {
+      font-size: 11px;
+      color: #c0392b;
+      margin-top: 4px;
+      display: none;
+    }
+    .field.has-error input,
+    .field.has-error select,
+    .field.has-error textarea {
+      border-color: #c0392b;
+    }
+    .field.has-error .field-error { display: block; }
+
+    .status-msg {
+      display: none;
+      text-align: center;
+      padding: 12px 16px;
+      border-radius: var(--radius);
+      font-size: 13px;
+      margin-bottom: 1rem;
+    }
+    .status-msg.error { background: #fdf0ef; color: #c0392b; border: 1px solid #f5c6c2; display: block; }
+    .status-msg.success { background: #eef6f1; color: #1a7a42; border: 1px solid #b8dfc8; display: block; }
+
+    /* Success screen */
+    #success-view { display: none; text-align: center; padding: 3rem 1rem; }
+    .success-icon {
+      width: 52px; height: 52px;
+      border: 1.5px solid var(--navy);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 1.25rem;
+      font-size: 22px;
+    }
+    #success-view h2 {
+      font-family: 'Lora', serif;
+      font-size: 22px;
+      font-weight: 500;
+      color: var(--navy);
+      margin-bottom: 0.5rem;
+    }
+    #success-view p { font-size: 14px; color: var(--muted); line-height: 1.7; }
+
+    /* Honeypot — hidden anti-spam field. Real users never see or focus it;
+       bots that auto-fill every field reveal themselves by filling it. */
+    .hp-field {
+      position: absolute !important;
+      left: -9999px !important;
+      top: -9999px !important;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      opacity: 0;
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 2rem;
+      font-size: 12px;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="org-name">Fellowship of Indonesian Christians in America</div>
+  </header>
+
+  <div class="hero">
+    <p class="hero-eyebrow">Overseas Mission Conference · 2026</p>
+    <h1>Register for OMC 2026</h1>
+    <p class="hero-sub">Filled to Overflow — join us as we gather, grow, and go together.</p>
+    <div class="hero-divider"></div>
+  </div>
+
+  <div class="page-wrap">
+
+    <div id="status-msg" class="status-msg"></div>
+
+    <div id="form-view">
+
+      <!-- Honeypot: hidden from humans, a spam trap. Leave blank. -->
+      <div class="hp-field" aria-hidden="true">
+        <label for="hp-website">Website</label>
+        <input type="text" id="hp-website" name="website" tabindex="-1" autocomplete="off" />
+      </div>
+
+      <!-- Personal info -->
+      <div class="card">
+        <p class="card-title">Personal details</p>
+
+        <div class="row">
+          <div class="field" id="f-firstname">
+            <label>First name *</label>
+            <input type="text" name="firstName" placeholder="First name" />
+            <p class="field-error">Please enter your first name.</p>
+          </div>
+          <div class="field" id="f-lastname">
+            <label>Last name *</label>
+            <input type="text" name="lastName" placeholder="Last name" />
+            <p class="field-error">Please enter your last name.</p>
+          </div>
+        </div>
+
+        <div class="field" id="f-email">
+          <label>Email address *</label>
+          <input type="email" name="email" placeholder="you@email.com" />
+          <p class="field-error">Please enter a valid email address.</p>
+        </div>
+
+        <div class="row">
+          <div class="field">
+            <label>Phone (optional)</label>
+            <input type="tel" name="phone" placeholder="+1 000 000 0000" />
+          </div>
+          <div class="field">
+            <label>City / state</label>
+            <input type="text" name="city" placeholder="e.g. Boston, MA" />
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="field">
+            <label>Church / organisation</label>
+            <input type="text" name="church" placeholder="Church or organisation" />
+          </div>
+          <div class="field">
+            <label>Role / vocation</label>
+            <input type="text" name="role" placeholder="e.g. Student, Pastor" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Ticket -->
+      <div class="card">
+        <p class="card-title">Ticket type</p>
+        <div class="ticket-grid" id="ticket-group">
+          <div class="ticket selected" data-val="Early Bird — £45">
+            <input type="radio" name="ticket" value="Early Bird — £45" checked />
+            <div class="t-name">Early bird</div>
+            <div class="t-price">£45</div>
+            <div class="t-badge">Ends 1 Jun</div>
+          </div>
+          <div class="ticket" data-val="Standard — £65">
+            <input type="radio" name="ticket" value="Standard — £65" />
+            <div class="t-name">Standard</div>
+            <div class="t-price">£65</div>
+          </div>
+          <div class="ticket" data-val="Student / Concession — £25">
+            <input type="radio" name="ticket" value="Student / Concession — £25" />
+            <div class="t-name">Student / concession</div>
+            <div class="t-price">£25 · ID required</div>
+          </div>
+          <div class="ticket" data-val="Group (5+) — £38 pp">
+            <input type="radio" name="ticket" value="Group (5+) — £38 pp" />
+            <div class="t-name">Group (5+)</div>
+            <div class="t-price">£38 per person</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Additional -->
+      <div class="card">
+        <p class="card-title">A few more details</p>
+
+        <div class="field">
+          <label>Dietary requirements</label>
+          <input type="text" name="dietary" placeholder="e.g. vegetarian, gluten-free, none" />
+        </div>
+
+        <div class="field">
+          <label>How did you hear about OMC 2026?</label>
+          <select name="referral">
+            <option value="" disabled selected>Select one</option>
+            <option>FICA community / church</option>
+            <option>Friend or colleague</option>
+            <option>Social media</option>
+            <option>Email newsletter</option>
+            <option>FICA website</option>
+            <option>Previous OMC attendee</option>
+            <option>Other</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Anything else you'd like us to know? (optional)</label>
+          <textarea name="notes" placeholder="Accessibility needs, questions, etc."></textarea>
+        </div>
+      </div>
+
+      <!-- Consent -->
+      <div class="card">
+        <p class="card-title">Consent</p>
+        <div class="check-row">
+          <input type="checkbox" id="terms" />
+          <span>I agree to the <a href="https://fica.org" target="_blank">terms &amp; conditions</a> and FICA's privacy policy. *</span>
+        </div>
+        <div class="check-row">
+          <input type="checkbox" id="updates" />
+          <span>I'd like to receive updates about OMC and future FICA events.</span>
+        </div>
+      </div>
+
+      <div class="submit-area">
+        <button class="submit-btn" id="submit-btn" onclick="submitForm()">Complete registration</button>
+        <p class="submit-note">Your information is stored securely and will only be used for OMC 2026 planning.</p>
+      </div>
+
+    </div><!-- /form-view -->
+
+    <!-- Success screen -->
+    <div id="success-view">
+      <div class="success-icon">✓</div>
+      <h2>You're registered!</h2>
+      <p>Thank you for signing up for OMC 2026.<br />A confirmation has been sent to your email address.<br /><br />We look forward to seeing you there.</p>
+    </div>
+
+  </div><!-- /page-wrap -->
+
+  <footer class="footer">
+    © 2026 Fellowship of Indonesian Christians in America · <a href="https://fica.org" style="color:inherit">fica.org</a>
+  </footer>
+
+  <script>
+    // ──────────────────────────────────────────────────────────
+    // STEP 1: Paste your Google Apps Script Web App URL here after
+    // deploying it (see SETUP-INSTRUCTIONS.md). It looks like:
+    // https://script.google.com/macros/s/AKfy..../exec
+    // ──────────────────────────────────────────────────────────
+    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyq08b6RrtlxnUDxslG4wl3Oj8jQHTA_6zis8WQ1QJjAQCwSEuAwNC4eELfVcdlxHke/exec';
+
+    // Ticket selection
+    document.querySelectorAll('.ticket').forEach(t => {
+      t.addEventListener('click', () => {
+        document.querySelectorAll('.ticket').forEach(x => x.classList.remove('selected'));
+        t.classList.add('selected');
+        t.querySelector('input').checked = true;
+      });
+    });
+
+    function getVal(name) {
+      const el = document.querySelector(`[name="${name}"]`);
+      return el ? el.value.trim() : '';
+    }
+
+    function setError(fieldId, show) {
+      const el = document.getElementById(fieldId);
+      if (el) el.classList.toggle('has-error', show);
+    }
+
+    function showStatus(msg, type) {
+      const el = document.getElementById('status-msg');
+      el.textContent = msg;
+      el.className = 'status-msg ' + type;
+      el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    async function submitForm() {
+      // Clear previous errors
+      ['f-firstname','f-lastname','f-email'].forEach(id => setError(id, false));
+      document.getElementById('status-msg').className = 'status-msg';
+
+      // Validate
+      let valid = true;
+      if (!getVal('firstName')) { setError('f-firstname', true); valid = false; }
+      if (!getVal('lastName'))  { setError('f-lastname', true);  valid = false; }
+      const email = getVal('email');
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setError('f-email', true); valid = false; }
+      if (!document.getElementById('terms').checked) {
+        showStatus('Please accept the terms & conditions to continue.', 'error');
+        valid = false;
+      }
+      if (!valid) return;
+
+      // Honeypot: a real user can't see or focus the hidden "website" field,
+      // so if it has a value the submission is almost certainly a bot. Show
+      // the success screen (so the bot doesn't retry) but send nothing.
+      if (getVal('website')) {
+        document.getElementById('form-view').style.display = 'none';
+        document.getElementById('success-view').style.display = 'block';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
+
+      if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') {
+        showStatus('Form is not connected yet. Please set the Apps Script URL (see SETUP-INSTRUCTIONS.md).', 'error');
+        return;
+      }
+
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      btn.textContent = 'Submitting…';
+
+      const selectedTicket = document.querySelector('.ticket.selected input')?.value || '';
+      const wantsUpdates = document.getElementById('updates').checked ? 'Yes' : 'No';
+
+      const payload = {
+        timestamp: new Date().toISOString(),
+        firstName: getVal('firstName'),
+        lastName: getVal('lastName'),
+        email: getVal('email'),
+        phone: getVal('phone'),
+        city: getVal('city'),
+        church: getVal('church'),
+        role: getVal('role'),
+        ticket: selectedTicket,
+        dietary: getVal('dietary'),
+        referral: getVal('referral'),
+        notes: getVal('notes'),
+        marketingOptIn: wantsUpdates,
+      };
+
+      try {
+        // Apps Script web apps don't send CORS headers, so we POST in
+        // "no-cors" mode with a text/plain body (which avoids a preflight
+        // request the script can't answer). The script reads the raw body
+        // and parses it as JSON. We can't read the response in this mode,
+        // so a resolved fetch is treated as success.
+        await fetch(APPS_SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(payload),
+        });
+        document.getElementById('form-view').style.display = 'none';
+        document.getElementById('success-view').style.display = 'block';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } catch (err) {
+        showStatus('Something went wrong. Please try again or contact us directly.', 'error');
+        btn.disabled = false;
+        btn.textContent = 'Complete registration';
+      }
+    }
+  </script>
+
+</body>
+</html>
