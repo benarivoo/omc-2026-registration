@@ -500,6 +500,75 @@
       text-transform: uppercase; letter-spacing: 0.06em;
     }
 
+    /* T-shirt order */
+    .tshirt-options-img {
+      width: 100%; max-width: 360px; display: block; margin: 0.25rem auto 1.1rem;
+      border: 1px solid var(--border); border-radius: var(--radius);
+    }
+    .tshirt-matrix { width: 100%; border-collapse: collapse; margin-top: 0.4rem; }
+    .tshirt-matrix th, .tshirt-matrix td {
+      padding: 8px 6px; text-align: center;
+      border-bottom: 1px solid var(--border); color: var(--navy); font-size: 13px;
+    }
+    .tshirt-matrix th {
+      font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em;
+      color: var(--muted); font-weight: 600;
+    }
+    .tshirt-matrix td:first-child, .tshirt-matrix th:first-child { text-align: left; font-weight: 600; }
+    .tshirt-matrix input {
+      width: 54px; text-align: center; padding: 6px; font-size: 14px;
+      border: 1px solid var(--border); border-radius: 6px;
+      background: var(--white); color: var(--navy);
+    }
+    details.size-guide { margin-top: 0.85rem; }
+    details.size-guide summary {
+      cursor: pointer; font-size: 12px; color: var(--navy); font-weight: 500;
+    }
+    .size-chart { width: 100%; border-collapse: collapse; margin: 0.6rem 0 0.25rem; }
+    .size-chart caption { font-size: 11px; color: var(--muted); margin-bottom: 6px; text-align: left; }
+    .size-chart th, .size-chart td {
+      padding: 6px 8px; text-align: center; font-size: 12px;
+      border: 1px solid var(--border); color: var(--navy);
+    }
+    .size-chart th {
+      background: var(--cream); font-weight: 600; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.04em; font-size: 11px;
+    }
+
+    /* Order summary (ticket + t-shirt) */
+    .order-summary {
+      background: var(--navy); color: var(--white);
+      border-radius: var(--radius); padding: 16px 18px; margin-top: 0.25rem;
+    }
+    .order-summary .os-line {
+      display: flex; justify-content: space-between; align-items: baseline;
+      font-size: 13px; color: rgba(255,255,255,0.72); padding: 5px 0; gap: 12px;
+    }
+    .order-summary .os-line span:last-child { color: var(--white); font-weight: 500; }
+    .order-summary .os-total {
+      border-top: 1px solid rgba(255,255,255,0.2); margin-top: 6px; padding-top: 10px;
+    }
+    .order-summary .os-total span { font-size: 18px; color: var(--white); font-weight: 600; }
+
+    /* FICA quiz call-to-action */
+    .quiz-cta {
+      display: inline-block; margin-top: 0.65rem;
+      background: var(--gold); color: var(--navy);
+      text-decoration: none; font-weight: 600; font-size: 14px;
+      padding: 10px 20px; border-radius: 999px;
+    }
+    .quiz-cta:hover { background: var(--gold-light); }
+    .quiz-box {
+      background: var(--cream); border: 1px solid var(--border);
+      border-radius: 12px; padding: 1.25rem; max-width: 420px;
+      margin: 1.25rem auto 0; text-align: center;
+    }
+    .quiz-box h3 {
+      font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em;
+      color: var(--navy); margin-bottom: 0.5rem;
+    }
+    #success-view .quiz-box p { font-size: 13px; color: var(--muted); margin-bottom: 0; line-height: 1.5; }
+
     /* Share link (group lead) */
     .share-box {
       background: var(--cream);
@@ -817,6 +886,56 @@
         </div>
       </div>
 
+      <!-- T-shirt -->
+      <div class="card" id="tshirt-card">
+        <p class="card-title">OMC 2026 t-shirt</p>
+        <p class="group-hint" style="margin-top:0;">Take home the "Filled to Overflow" tee — $25 each, available in white and blue.</p>
+
+        <img class="tshirt-options-img" src="t-shirt/Tshirt%20Options.jpeg" alt="OMC 2026 'Filled to Overflow' t-shirt designs in blue and white" />
+
+        <p class="ticket-section-label">Would you like to order a t-shirt?</p>
+        <div class="ticket-grid" id="tshirt-toggle-group">
+          <div class="ticket selected" data-tshirt="no">
+            <input type="radio" name="tshirtChoice" value="no" checked />
+            <div class="t-name">No thanks</div>
+            <div class="t-price">Skip the t-shirt</div>
+          </div>
+          <div class="ticket" data-tshirt="yes">
+            <input type="radio" name="tshirtChoice" value="yes" />
+            <div class="t-name">Yes, add t-shirts</div>
+            <div class="t-price">$25 each</div>
+          </div>
+        </div>
+
+        <div id="tshirt-detail" hidden>
+          <p class="ticket-section-label" style="margin-top:1.25rem;">Quantity per colour &amp; size</p>
+          <table class="tshirt-matrix">
+            <thead>
+              <tr><th>Size</th><th>White</th><th>Blue</th></tr>
+            </thead>
+            <tbody id="tshirt-matrix-body"><!-- rows injected by JS --></tbody>
+          </table>
+
+          <details class="size-guide">
+            <summary>View size chart (cm)</summary>
+            <table class="size-chart">
+              <caption>A = half-chest width (flat) · B = body length</caption>
+              <thead><tr><th>Size</th><th>A (cm)</th><th>B (cm)</th></tr></thead>
+              <tbody>
+                <tr><td>S</td><td>48</td><td>67</td></tr>
+                <tr><td>M</td><td>50</td><td>69</td></tr>
+                <tr><td>L</td><td>52</td><td>71</td></tr>
+                <tr><td>XL</td><td>54</td><td>73</td></tr>
+                <tr><td>XXL</td><td>56</td><td>75</td></tr>
+                <tr><td>3XL</td><td>58</td><td>77</td></tr>
+              </tbody>
+            </table>
+          </details>
+
+          <p class="group-hint" id="tshirt-hint">Enter a quantity for the colours and sizes you want.</p>
+        </div>
+      </div>
+
       <!-- Consent -->
       <div class="card">
         <p class="card-title">Consent</p>
@@ -828,6 +947,19 @@
           <input type="checkbox" id="updates" />
           <span>I'd like to receive updates about OMC and future FICA events.</span>
         </div>
+      </div>
+
+      <!-- Order summary -->
+      <div class="card" id="summary-card">
+        <p class="card-title">Order summary</p>
+        <div class="order-summary" id="order-summary"></div>
+      </div>
+
+      <!-- FICA quiz -->
+      <div class="card" id="quiz-card">
+        <p class="card-title">Before you go — what fish are you?</p>
+        <p class="group-hint" style="margin-top:0;">Take FICA's quick "What Fish Are You?" quiz — a fun way to start your OMC 2026 journey. It only takes a minute.</p>
+        <a class="quiz-cta" href="https://omc2026fishquiz.netlify.app" target="_blank" rel="noopener">Take the quiz</a>
       </div>
 
       <div class="submit-area">
@@ -881,6 +1013,13 @@
           <button class="copy-btn" id="copy-link-btn" type="button">Copy</button>
         </div>
       </div>
+
+      <!-- FICA quiz (shown to everyone) -->
+      <div class="quiz-box" id="quiz-box">
+        <h3>Haven't taken the quiz yet?</h3>
+        <p>Discover which fish you are with FICA's "What Fish Are You?" quiz.</p>
+        <a class="quiz-cta" href="https://omc2026fishquiz.netlify.app" target="_blank" rel="noopener">Take the quiz</a>
+      </div>
     </div>
 
   </div><!-- /page-wrap -->
@@ -908,6 +1047,11 @@
     // Group discount: $10 off per person for groups of this size or larger.
     const GROUP_MIN = 5;
     const GROUP_DISCOUNT_PER_PERSON = 10;
+
+    // T-shirts: flat price each, two colours, six sizes (see size chart in form).
+    const TSHIRT_PRICE = 25;
+    const TSHIRT_SIZES = ['S', 'M', 'L', 'XL', 'XXL', '3XL'];
+    const TSHIRT_COLORS = [{ key: 'white', label: 'White' }, { key: 'blue', label: 'Blue' }];
 
     // Detect group-member mode from the URL (?group=CODE). Members fill in their
     // own details and don't pay — their group lead already covered them.
@@ -977,12 +1121,7 @@
     }
 
     function getGroupTotal(period) {
-      let total = 0;
-      QTY_FIELDS.forEach(f => {
-        const each = getTicketPrice(f.category, f.pkg, period) - GROUP_DISCOUNT_PER_PERSON;
-        total += getQty(f.id) * Math.max(each, 0);
-      });
-      return total;
+      return getGroupBreakdown(period).total;
     }
 
     function getGroupCountsLabel() {
@@ -994,6 +1133,11 @@
     }
 
     function updatePricingUI() {
+      updateTicketUI();
+      updateOrderSummary();
+    }
+
+    function updateTicketUI() {
       const period = getPricingPeriod();
       const badge = document.getElementById('period-badge');
       const amountEl = document.getElementById('selected-price-amount');
@@ -1074,6 +1218,137 @@
       submitBtn.textContent = 'Continue to payment';
     }
 
+    // ── T-shirts ──────────────────────────────────────────────
+    function buildTshirtMatrix() {
+      const body = document.getElementById('tshirt-matrix-body');
+      if (!body || body.children.length) return;
+      TSHIRT_SIZES.forEach(size => {
+        const tr = document.createElement('tr');
+        let html = `<td>${size}</td>`;
+        TSHIRT_COLORS.forEach(c => {
+          html += `<td><input type="number" min="0" value="0" inputmode="numeric"`
+                + ` id="ts_${c.key}_${size}" data-ts-color="${c.key}" data-ts-size="${size}" /></td>`;
+        });
+        tr.innerHTML = html;
+        body.appendChild(tr);
+      });
+    }
+
+    function tshirtOrdering() {
+      const sel = document.querySelector('#tshirt-toggle-group .ticket.selected');
+      return !!sel && sel.dataset.tshirt === 'yes';
+    }
+
+    function getTshirtData() {
+      if (!tshirtOrdering()) return { qty: 0, total: 0, summary: '', lines: [] };
+      let qty = 0;
+      const parts = [];
+      const lines = [];
+      TSHIRT_COLORS.forEach(c => {
+        TSHIRT_SIZES.forEach(size => {
+          const el = document.getElementById(`ts_${c.key}_${size}`);
+          const n = el ? Math.max(0, parseInt(el.value, 10) || 0) : 0;
+          if (n > 0) {
+            qty += n;
+            parts.push(`${n}× ${c.label} ${size}`);
+            lines.push({ color: c.label, size: size, quantity: n });
+          }
+        });
+      });
+      return { qty, total: qty * TSHIRT_PRICE, summary: parts.join(', '), lines: lines };
+    }
+
+    // Per-ticket-type line items for the "Ticket Orders" sheet.
+    // Individual: a single line. Group: one line per non-empty quantity field.
+    function getTicketLines(period) {
+      const lines = [];
+      const catLabel = c => (c === 'student' ? 'Student' : 'Professional');
+      if (registrationType === 'group') {
+        QTY_FIELDS.forEach(f => {
+          const qty = getQty(f.id);
+          if (qty > 0) {
+            lines.push({
+              type: catLabel(f.category),
+              accommodation: (f.pkg === 'full'),
+              unitPrice: getTicketPrice(f.category, f.pkg, period),
+              quantity: qty,
+              earlyBird: (period === 'early-bird'),
+            });
+          }
+        });
+      } else if (registrationType !== 'group-member') {
+        const category = getSelectedCategory();
+        const pkg = getSelectedPackage();
+        lines.push({
+          type: catLabel(category),
+          accommodation: (pkg === 'full'),
+          unitPrice: getTicketPrice(category, pkg, period),
+          quantity: 1,
+          earlyBird: (period === 'early-bird'),
+        });
+      }
+      return lines;
+    }
+
+    function updateTshirtHint() {
+      const hint = document.getElementById('tshirt-hint');
+      if (!hint) return;
+      const ts = getTshirtData();
+      hint.textContent = ts.qty > 0
+        ? `${ts.qty} t-shirt${ts.qty > 1 ? 's' : ''} · $${ts.total} — ${ts.summary}`
+        : 'Enter a quantity for the colours and sizes you want.';
+    }
+
+    // Group order breakdown: people count, subtotal (pre-discount), discount, total.
+    function getGroupBreakdown(period) {
+      let subtotal = 0;
+      QTY_FIELDS.forEach(f => {
+        subtotal += getQty(f.id) * getTicketPrice(f.category, f.pkg, period);
+      });
+      const size = getGroupSize();
+      const discount = size * GROUP_DISCOUNT_PER_PERSON;
+      const total = Math.max(subtotal - discount, 0);
+      return { size, subtotal, discount, total };
+    }
+
+    function osLine(label, amount, isTotal) {
+      return `<div class="os-line${isTotal ? ' os-total' : ''}"><span>${label}</span><span>${amount}</span></div>`;
+    }
+
+    function updateOrderSummary() {
+      const box = document.getElementById('order-summary');
+      if (!box) return;
+      const period = getPricingPeriod();
+      const locked = (period === 'not-open' || period === 'closed');
+      const ts = getTshirtData();
+      const money = v => (locked ? '—' : `$${v}`);
+      const rows = [];
+      let ticketCost = 0;
+
+      if (registrationType === 'group') {
+        const b = getGroupBreakdown(period);
+        ticketCost = b.total;
+        rows.push(osLine(`Subtotal (${b.size} ${b.size === 1 ? 'person' : 'people'})`, money(b.subtotal)));
+        rows.push(osLine(`Group discount ($${GROUP_DISCOUNT_PER_PERSON} × ${b.size})`, locked ? '—' : `−$${b.discount}`));
+      } else if (registrationType === 'group-member') {
+        rows.push(osLine('Registration (covered by group lead)', '$0'));
+      } else {
+        ticketCost = getTicketPrice(getSelectedCategory(), getSelectedPackage(), period);
+        rows.push(osLine('Registration', money(ticketCost)));
+      }
+
+      // Itemise each t-shirt (colour + size), then a t-shirt subtotal line.
+      if (ts.lines.length) {
+        ts.lines.forEach(ln => {
+          rows.push(osLine(`T-shirt — ${ln.color} ${ln.size} (${ln.quantity} × $${TSHIRT_PRICE})`, `$${ln.quantity * TSHIRT_PRICE}`));
+        });
+        rows.push(osLine(`Total t-shirts (${ts.qty})`, `$${ts.total}`));
+      }
+
+      rows.push(osLine('Total due', money(ticketCost + ts.total), true));
+      box.innerHTML = rows.join('');
+    }
+
     function applyMode() {
       const pathCard = document.getElementById('path-card');
       const memberBanner = document.getElementById('member-banner');
@@ -1140,6 +1415,24 @@
 
     bindTicketGroup('category-group');
     bindTicketGroup('package-group');
+
+    // T-shirt: build the colour/size grid, then wire the order toggle + inputs.
+    buildTshirtMatrix();
+    document.querySelectorAll('#tshirt-toggle-group .ticket').forEach(t => {
+      t.addEventListener('click', () => {
+        document.querySelectorAll('#tshirt-toggle-group .ticket').forEach(x => x.classList.remove('selected'));
+        t.classList.add('selected');
+        t.querySelector('input').checked = true;
+        document.getElementById('tshirt-detail').hidden = (t.dataset.tshirt !== 'yes');
+        updateTshirtHint();
+        updateOrderSummary();
+      });
+    });
+    document.getElementById('tshirt-matrix-body').addEventListener('input', () => {
+      updateTshirtHint();
+      updateOrderSummary();
+    });
+
     applyMode();
 
     function getVal(name) {
@@ -1161,6 +1454,7 @@
 
     function basePayload(extra) {
       const wantsUpdates = document.getElementById('updates').checked ? 'Yes' : 'No';
+      const ts = getTshirtData();
       return Object.assign({
         timestamp: new Date().toISOString(),
         firstName: getVal('firstName'),
@@ -1179,7 +1473,16 @@
         groupName: '',
         groupCode: '',
         groupSize: '',
+        regTicketType: '',
+        ticketBeforeDiscount: 0,
+        ticketDiscount: 0,
+        ticketAfterDiscount: 0,
         amountDue: '',
+        tshirtOrder: ts.summary,
+        tshirtQty: ts.qty,
+        tshirtTotal: ts.total,
+        ticketLines: [],
+        tshirtLines: ts.lines,
         baseUrl: location.origin + location.pathname,
       }, extra);
     }
@@ -1197,7 +1500,16 @@
 
       if (info.type === 'group-member') {
         title.textContent = "You're on the list!";
-        message.innerHTML = `Your spot in group <strong>${info.code}</strong> is reserved — your group lead has covered your registration. A confirmation has been emailed to you.`;
+        if (info.amount > 0) {
+          message.innerHTML = `Your spot in group <strong>${info.code}</strong> is reserved — your registration is covered by your group lead. You added <strong>$${info.amount}</strong> of t-shirts; please complete payment below to confirm your order.`;
+          document.getElementById('pay-amount').textContent = `$${info.amount}`;
+          document.getElementById('pay-zelle').textContent = PAYMENT.zelle;
+          document.getElementById('pay-venmo').textContent = PAYMENT.venmo;
+          document.getElementById('pay-ref-value').textContent = `${info.code} ${info.name}`;
+          payBox.hidden = false;
+        } else {
+          message.innerHTML = `Your spot in group <strong>${info.code}</strong> is reserved — your group lead has covered your registration. A confirmation has been emailed to you.`;
+        }
       } else {
         title.textContent = 'Almost done — please pay to confirm';
         const hasCode = info.type === 'group-lead' && info.code;
@@ -1271,20 +1583,28 @@
       if (period === 'closed') { showStatus('Registration has closed. Contact us if you need assistance.', 'error'); return; }
 
       const fullName = `${getVal('firstName')} ${getVal('lastName')}`;
+      const tshirt = getTshirtData();
+      const ticketLines = getTicketLines(period);
       let payload, successInfo;
 
       if (registrationType === 'group') {
         const size = getGroupSize();
         if (size < GROUP_MIN) { showStatus(`Groups need at least ${GROUP_MIN} people. Add more to continue.`, 'error'); return; }
 
-        const total = getGroupTotal(period);
+        const b = getGroupBreakdown(period);
+        const total = b.total + tshirt.total;
         // The group name is assigned by the server (group-1, group-2, ...).
         // We send our page URL so the script can email a working share link.
         payload = basePayload({
           registrationType: 'group-lead',
+          regTicketType: 'Group',
           ticket: `Group lead — ${getGroupCountsLabel()}`,
           groupSize: size,
+          ticketBeforeDiscount: b.subtotal,
+          ticketDiscount: b.discount,
+          ticketAfterDiscount: b.total,
           amountDue: total,
+          ticketLines: ticketLines,
           baseUrl: location.origin + location.pathname,
         });
         successInfo = { type: 'group-lead', amount: total, name: fullName };
@@ -1292,22 +1612,33 @@
       } else if (registrationType === 'group-member') {
         payload = basePayload({
           registrationType: 'group-member',
+          regTicketType: 'Group member',
           ticket: 'Group member (covered by lead)',
           groupCode: activeGroupCode,
-          amountDue: 0,
+          ticketBeforeDiscount: 0,
+          ticketDiscount: 0,
+          ticketAfterDiscount: 0,
+          amountDue: tshirt.total,
+          ticketLines: [],
         });
-        successInfo = { type: 'group-member', code: activeGroupCode };
+        successInfo = { type: 'group-member', code: activeGroupCode, amount: tshirt.total, name: fullName };
 
       } else {
         const category = getSelectedCategory();
         const pkg = getSelectedPackage();
         const price = getTicketPrice(category, pkg, period);
+        const total = price + tshirt.total;
         payload = basePayload({
           registrationType: 'individual',
+          regTicketType: category === 'student' ? 'Student' : 'Professional',
           ticket: formatTicketLabel(category, pkg, period, price),
-          amountDue: price,
+          ticketBeforeDiscount: price,
+          ticketDiscount: 0,
+          ticketAfterDiscount: price,
+          amountDue: total,
+          ticketLines: ticketLines,
         });
-        successInfo = { type: 'individual', amount: price, name: fullName };
+        successInfo = { type: 'individual', amount: total, name: fullName };
       }
 
       const btn = document.getElementById('submit-btn');
