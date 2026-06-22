@@ -19,7 +19,7 @@ var PAYMENTS_SHEET_NAME = 'Payments';
 // Keep PAYMENT_ZELLE / PAYMENT_VENMO in sync with the PAYMENT object in
 // omc-registration.html. Fill these in with your real handles.
 var EVENT_NAME = 'OMC 2026';
-var REPLY_TO = 'omc@fica.org';                 // ← contact / reply-to address
+var REPLY_TO = 'fica.treasury@gmail.com';      // ← contact / reply-to address
 // Finance / organiser addresses CC'd on the payment-instructions email (sent at
 // registration) and the payment-proof acknowledgement (sent after upload), so
 // they keep a record and can follow up if a registrant doesn't finish.
