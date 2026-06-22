@@ -13,15 +13,34 @@
 var SHEET_NAME = 'Registrations';
 var TICKET_SHEET_NAME = 'Ticket Orders';
 var TSHIRT_SHEET_NAME = 'TShirt Orders';
+var PAYMENTS_SHEET_NAME = 'Payments';
 
 // Event + payment details used in the confirmation emails.
 // Keep PAYMENT_ZELLE / PAYMENT_VENMO in sync with the PAYMENT object in
 // omc-registration.html. Fill these in with your real handles.
 var EVENT_NAME = 'OMC 2026';
 var REPLY_TO = 'omc@fica.org';                 // ← contact / reply-to address
+// Finance / organiser addresses CC'd on the payment-instructions email (sent at
+// registration) and the payment-proof acknowledgement (sent after upload), so
+// they keep a record and can follow up if a registrant doesn't finish.
+var FINANCE_CC = 'fica.treasury@gmail.com, yennychandra@fica.org';
 var PAYMENT_ZELLE = 'fica.treasury@gmail.com'; // Zelle email
 var PAYMENT_VENMO = '@givetofica';             // Venmo handle
 var QUIZ_URL = 'https://omc2026fishquiz.netlify.app'; // FICA "What Fish Are You?" quiz
+
+// Public address of the FOLDER where the pages are hosted (must end in "/").
+// Email links — the "Complete your payment" button and the Zelle/Venmo QR images
+// — are built from this so they're always clickable, even when a test
+// registration was submitted from a local file:// or localhost page (Gmail won't
+// linkify those). Leave blank to fall back to the page the form was submitted
+// from. Change this to the WordPress URL for production.
+var SITE_BASE_URL = 'https://benarivoo.github.io/omc-2026-registration/';
+
+// Google Drive folder where payment receipts + student IDs are saved. Create a
+// folder in your Drive, open it, and copy the ID from the URL
+// (drive.google.com/drive/folders/THIS_PART). Leave blank to auto-create a
+// folder named "OMC 2026 Payments" in the script owner's Drive root.
+var PAYMENTS_FOLDER_ID = '1uQDMwvcMDmUrZU6o31ReOrjz9FE3ndx5';
 
 // Group discount per person + flat t-shirt price (keep in sync with the form).
 var GROUP_DISCOUNT_PER_PERSON = 10;
@@ -37,7 +56,8 @@ var COLUMNS = [
   { key: 'lastName',             header: 'Last name' },
   { key: 'email',                header: 'Email' },
   { key: 'phone',                header: 'Phone' },
-  { key: 'city',                 header: 'City / state' },
+  { key: 'city',                 header: 'City' },
+  { key: 'state',                header: 'State' },
   { key: 'church',               header: 'Church / organisation' },
   { key: 'role',                 header: 'Role / vocation' },
   { key: 'regTicketType',        header: 'Ticket Type' },
@@ -58,7 +78,8 @@ var COLUMNS = [
   { key: 'referredByName',       header: 'Referred by (name)' },
   { key: 'referredByEmail',      header: 'Referred by (email)' },
   { key: 'notes',                header: 'Notes' },
-  { key: 'marketingOptIn',       header: 'Marketing opt-in' }
+  { key: 'marketingOptIn',       header: 'Marketing opt-in' },
+  { key: 'school',               header: 'School / company' }
 ];
 
 // "Ticket Orders" sheet — one row per ticket type within a registration, plus a
@@ -67,6 +88,9 @@ var TICKET_COLUMNS = ['Registration ID', 'Ticket Type', 'Accommodation Ordered',
 
 // "TShirt Orders" sheet — one row per (registration, colour, size) combination.
 var TSHIRT_COLUMNS = ['Registration ID', 'Color', 'Size', 'Quantity', 'Unit Price', 'Total Price', 'TShirt Order ID'];
+
+// "Payments" sheet — one row per payment-proof submission from omc-payment.html.
+var PAYMENTS_COLUMNS = ['Registration ID', 'Timestamp', 'Name', 'Email', 'Category', 'Amount (USD)', 'Receipt Link', 'Student ID Link', 'Folder Link'];
 
 /**
  * Handles POST requests from the registration form.
@@ -79,6 +103,11 @@ function doPost(e) {
     var data = {};
     if (e && e.postData && e.postData.contents) {
       data = JSON.parse(e.postData.contents);
+    }
+
+    // Payment-proof upload from omc-payment.html (separate flow from intake).
+    if (data.action === 'payment') {
+      return handlePaymentSubmission_(data);
     }
 
     // Honeypot: the form's hidden "website" field must stay empty. A value
@@ -157,12 +186,164 @@ function doPost(e) {
       // Intentionally ignored — the row is already saved.
     }
 
-    return jsonOutput_({ result: 'success', groupCode: data.groupCode || '' });
+    return jsonOutput_({ result: 'success', groupCode: data.groupCode || '', registrationId: data.registrationId });
   } catch (err) {
     return jsonOutput_({ result: 'error', message: String(err) });
   } finally {
     lock.releaseLock();
   }
+}
+
+/**
+ * Handles a payment-proof submission from omc-payment.html: saves the uploaded
+ * receipt (and student ID, for students) to Google Drive, records a row in the
+ * "Payments" sheet, and emails the registrant an acknowledgement.
+ *
+ * Expected payload: { action:'payment', regId, name, email, category, amount,
+ *   ref, files:[{ kind:'receipt'|'studentId', name, mimeType, dataBase64 }] }
+ */
+function handlePaymentSubmission_(data) {
+  var files = data.files || [];
+  if (!files.length) {
+    return jsonOutput_({ result: 'error', message: 'No files received.' });
+  }
+
+  // A per-registration subfolder keeps each person's documents together.
+  var parent = getPaymentsFolder_();
+  var folderName = (data.regId ? (data.regId + ' - ') : '')
+    + (data.name || 'Unknown') + ' - ' + formatStamp_(new Date());
+  var folder = parent.createFolder(sanitizeName_(folderName));
+
+  var receiptLink = '';
+  var studentIdLink = '';
+  files.forEach(function (f) {
+    if (!f || !f.dataBase64) return;
+    var bytes = Utilities.base64Decode(f.dataBase64);
+    var blob = Utilities.newBlob(bytes, f.mimeType || 'application/octet-stream', f.name || (f.kind || 'file'));
+    var file = folder.createFile(blob);
+    if (f.kind === 'studentId') {
+      studentIdLink = file.getUrl();
+    } else {
+      receiptLink = file.getUrl();
+    }
+  });
+
+  // Record the submission for finance to verify against payments received.
+  try {
+    var sheet = getOrCreateSheet_(PAYMENTS_SHEET_NAME, PAYMENTS_COLUMNS);
+    sheet.appendRow([
+      data.regId || '',
+      new Date().toISOString(),
+      data.name || '',
+      data.email || '',
+      data.category || '',
+      Number(data.amount) || 0,
+      receiptLink,
+      studentIdLink,
+      folder.getUrl()
+    ]);
+  } catch (sheetErr) {
+    // Files are already saved; don't fail the request over the log row.
+  }
+
+  // Let the registrant know we have their proof and it's under review.
+  try {
+    sendPaymentAckEmail_(data);
+  } catch (mailErr) {
+    // Intentionally ignored — the upload itself already succeeded.
+  }
+
+  return jsonOutput_({ result: 'success' });
+}
+
+/**
+ * Returns the Drive folder where payment documents are saved — the configured
+ * PAYMENTS_FOLDER_ID if set, otherwise an auto-created "OMC 2026 Payments"
+ * folder in the script owner's Drive root.
+ */
+function getPaymentsFolder_() {
+  if (PAYMENTS_FOLDER_ID) {
+    return DriveApp.getFolderById(PAYMENTS_FOLDER_ID);
+  }
+  var name = EVENT_NAME + ' Payments';
+  var existing = DriveApp.getFoldersByName(name);
+  return existing.hasNext() ? existing.next() : DriveApp.createFolder(name);
+}
+
+/**
+ * Emails the registrant a confirmation that their payment proof was received
+ * and is under review, with the fish-quiz link.
+ */
+function sendPaymentAckEmail_(data) {
+  if (!data.email) return;
+  var firstName = (data.name || '').split(' ')[0] || 'there';
+  var amount = Number(data.amount) || 0;
+  var subject = EVENT_NAME + ' — payment proof received';
+
+  var lines = [];
+  lines.push('Hi ' + firstName + ',');
+  lines.push('');
+  lines.push('Thank you — we have received your payment proof for ' + EVENT_NAME
+    + (amount ? (' (amount: $' + amount + ')') : '') + '.');
+  lines.push('');
+  lines.push('Our team will verify your payment and confirm your spot by email within 3 business days.');
+  if (data.regId) {
+    lines.push('');
+    lines.push('Your registration reference: ' + data.regId);
+  }
+  lines.push('');
+  lines.push('Haven\'t taken our "What Fish Are You?" quiz yet? Discover your fish here:');
+  lines.push('  ' + QUIZ_URL);
+  lines.push('');
+  lines.push('See you there,');
+  lines.push('The ' + EVENT_NAME + ' team');
+
+  MailApp.sendEmail({
+    to: data.email,
+    cc: FINANCE_CC,
+    subject: subject,
+    body: lines.join('\n'),
+    htmlBody: buildPaymentAckHtml_(firstName, amount, data.regId),
+    name: EVENT_NAME,
+    replyTo: REPLY_TO
+  });
+}
+
+/**
+ * HTML version of the payment-acknowledgement email.
+ */
+function buildPaymentAckHtml_(firstName, amount, regId) {
+  var esc = function (s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  };
+  var h = [];
+  h.push('<div style="font-family:Arial,Helvetica,sans-serif;color:#1a2640;max-width:520px;margin:0 auto;line-height:1.5;">');
+  h.push('<p>Hi ' + esc(firstName) + ',</p>');
+  h.push('<p>Thank you — we have received your payment proof for <strong>' + esc(EVENT_NAME) + '</strong>'
+    + (amount ? (' (amount: <strong>$' + esc(amount) + '</strong>)') : '') + '.</p>');
+  h.push('<p>Our team will verify your payment and confirm your spot by email within 3 business days.</p>');
+  if (regId) {
+    h.push('<p style="background:#faf8f4;border:1px dashed #e5e0d8;border-radius:8px;padding:10px 12px;">Your registration reference:<br><strong>' + esc(regId) + '</strong></p>');
+  }
+  h.push('<p style="background:#faf8f4;border:1px solid #e5e0d8;border-radius:8px;padding:12px 14px;font-size:13px;">Haven\'t taken our <strong>"What Fish Are You?"</strong> quiz yet? <a href="' + esc(QUIZ_URL) + '" style="color:#1a2640;font-weight:bold;">Discover your fish &rarr;</a></p>');
+  h.push('<p style="margin-top:18px;">See you there,<br>The ' + esc(EVENT_NAME) + ' team</p>');
+  h.push('</div>');
+  return h.join('');
+}
+
+/**
+ * Drive/folder-safe timestamp like "2026-06-20 15-04-09".
+ */
+function formatStamp_(d) {
+  return Utilities.formatDate(d, Session.getScriptTimeZone() || 'UTC', 'yyyy-MM-dd HH-mm-ss');
+}
+
+/**
+ * Strips characters that aren't safe in Drive file/folder names.
+ */
+function sanitizeName_(name) {
+  return String(name || '').replace(/[\\\/:*?"<>|]/g, '-').slice(0, 120);
 }
 
 /**
@@ -192,6 +373,47 @@ function runEmailAuthCheck() {
     replyTo: REPLY_TO
   });
   Logger.log('Test email sent to: ' + me);
+}
+
+/**
+ * RUN THIS ONCE to fix "We could not confirm your upload" on the payment page.
+ *
+ * In the Apps Script editor: pick "runDriveAuthCheck" in the function dropdown,
+ * click Run, and approve the **Google Drive** permission when prompted. This
+ * proves two things the public uploads need but can't prompt for themselves:
+ *   1. the Drive scope is authorized for you (the script owner), and
+ *   2. the configured PAYMENTS_FOLDER_ID is a folder your account can open.
+ *
+ * On success it creates (and then trashes) a tiny test file inside the payments
+ * folder and logs "Drive OK". If PAYMENTS_FOLDER_ID is wrong or your account
+ * can't access it, it throws a clear error naming the problem — fix the ID (or
+ * share the folder with this account) and run again. After this passes, real
+ * uploads from omc-payment.html will work.
+ */
+function runDriveAuthCheck() {
+  var me = Session.getActiveUser().getEmail();
+  var folder;
+  try {
+    folder = getPaymentsFolder_();
+  } catch (e) {
+    throw new Error('Cannot open the payments folder. Check PAYMENTS_FOLDER_ID ("'
+      + PAYMENTS_FOLDER_ID + '") — it must be a folder the account ' + me
+      + ' can access. Underlying error: ' + e);
+  }
+  var test = folder.createFile(
+    Utilities.newBlob('OMC 2026 Drive auth check — safe to delete.', 'text/plain', 'omc-drive-auth-check.txt'));
+  Logger.log('Drive OK — payments folder: "' + folder.getName() + '" (' + folder.getId()
+    + '), authorized as ' + me + '. Test file: ' + test.getUrl());
+  // Try to clean up the probe file. Trashing can be denied when the folder is
+  // shared from another account or lives in a Shared Drive — that's harmless and
+  // does NOT affect uploads (which only create folders/files). Just log it so the
+  // owner can delete the probe file manually.
+  try {
+    test.setTrashed(true);
+  } catch (trashErr) {
+    Logger.log('Note: could not auto-delete the probe file (this does not affect '
+      + 'uploads). Please delete "omc-drive-auth-check.txt" from the folder manually.');
+  }
 }
 
 /**
@@ -249,6 +471,15 @@ function sendConfirmationEmail_(data) {
     lines.push('Once we receive your payment we will confirm by email within 3 business days.');
   }
 
+  // Deep link back to the payment page (individual / june22 flow), pre-filled so
+  // they can return any time to pay and upload their receipt.
+  var payUrl = (type === 'individual') ? paymentPageUrl_(data) : '';
+  if (payUrl) {
+    lines.push('');
+    lines.push('Complete your payment and upload your receipt here (your details are pre-filled):');
+    lines.push('  ' + payUrl);
+  }
+
   if (type === 'group-lead') {
     lines.push('');
     lines.push('Your group name is ' + (data.groupCode || '') + '.');
@@ -288,6 +519,7 @@ function sendConfirmationEmail_(data) {
 
   MailApp.sendEmail({
     to: data.email,
+    cc: FINANCE_CC,
     subject: subject,
     body: lines.join('\n'),
     htmlBody: buildHtmlEmail_(type, data, name, ref, haveQr, isPayer),
@@ -298,13 +530,51 @@ function sendConfirmationEmail_(data) {
 }
 
 /**
- * Builds the absolute URLs of the Zelle/Venmo QR images, derived from the page
- * the form was submitted from (so it works wherever IT hosts the files).
+ * Builds the absolute URL of the payment page (omc-payment.html), pre-filled so
+ * an individual registrant can return later to pay and upload their receipt.
+ * Derived from the registration page the form was submitted from (data.baseUrl),
+ * so it works wherever IT hosts the files. The params match exactly what
+ * omc-payment.html reads on load, so the amount, Zelle/Venmo details and the
+ * payment reference all reappear. Returns '' if there's no base URL to build on.
+ */
+/**
+ * Returns the public folder URL (always ending in "/") that email links are
+ * built on: the configured SITE_BASE_URL if set, otherwise the directory of the
+ * page the form was submitted from — but only when that's a real http(s) URL, so
+ * a local file:// or localhost test never produces an unclickable email link.
+ * Returns '' if neither is usable.
+ */
+function siteDir_(baseUrl) {
+  if (SITE_BASE_URL) {
+    return SITE_BASE_URL.charAt(SITE_BASE_URL.length - 1) === '/' ? SITE_BASE_URL : (SITE_BASE_URL + '/');
+  }
+  if (!baseUrl || !/^https?:\/\//i.test(baseUrl)) return '';
+  var slash = baseUrl.lastIndexOf('/');
+  return slash >= 0 ? baseUrl.substring(0, slash + 1) : (baseUrl + '/');
+}
+
+function paymentPageUrl_(data) {
+  var dir = siteDir_(data.baseUrl);
+  if (!dir) return '';
+  var name = (data.firstName || '') + (data.lastName ? ' ' + data.lastName : '');
+  var params = [
+    'regId=' + encodeURIComponent(data.registrationId || ''),
+    'amount=' + encodeURIComponent(Number(data.amountDue) || 0),
+    'name=' + encodeURIComponent(name),
+    'email=' + encodeURIComponent(data.email || ''),
+    'category=' + encodeURIComponent((data.regTicketType || '').toLowerCase()),
+    'ref=' + encodeURIComponent(data.paymentRef || name)
+  ];
+  return dir + 'omc-payment.html?' + params.join('&');
+}
+
+/**
+ * Builds the absolute URLs of the Zelle/Venmo QR images, on the same public
+ * folder (SITE_BASE_URL, or the submitting page) as the rest of the email links.
  */
 function barcodeUrls_(baseUrl) {
-  if (!baseUrl) return null;
-  var slash = baseUrl.lastIndexOf('/');
-  var dir = slash >= 0 ? baseUrl.substring(0, slash + 1) : (baseUrl + '/');
+  var dir = siteDir_(baseUrl);
+  if (!dir) return null;
   return {
     zelle: dir + 'payment%20barcode/FICA%20Zelle.jpeg',
     venmo: dir + 'payment%20barcode/FICA%20Venmo.jpeg'
@@ -390,6 +660,14 @@ function buildHtmlEmail_(type, data, name, ref, haveQr, isPayer) {
     }
     h.push('<p style="background:#faf8f4;border:1px dashed #e5e0d8;border-radius:8px;padding:10px 12px;">Please include this reference with your payment:<br><strong>' + esc(ref) + '</strong></p>');
     h.push('<p style="font-size:13px;color:#6b7280;">Once we receive your payment we will confirm by email within 3 business days.</p>');
+  }
+
+  // Deep link back to the payment page (individual / june22 flow), pre-filled so
+  // they can return any time to pay and upload their receipt.
+  var payUrl = (type === 'individual') ? paymentPageUrl_(data) : '';
+  if (payUrl) {
+    h.push('<p style="text-align:center;margin:18px 0;"><a href="' + esc(payUrl) + '" style="display:inline-block;background:#c9a84c;color:#1a2640;text-decoration:none;font-weight:bold;font-size:14px;padding:12px 26px;border-radius:999px;">Complete your payment &amp; upload your receipt &rarr;</a></p>');
+    h.push('<p style="font-size:12px;color:#6b7280;text-align:center;margin:-6px 0 4px;">Your details are pre-filled — just pay and attach your receipt.</p>');
   }
 
   if (type === 'group-lead' && data.baseUrl) {

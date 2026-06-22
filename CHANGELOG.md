@@ -3,6 +3,75 @@
 A plain-language record of what changed in the registration form, intended for
 both the team and non-technical stakeholders.
 
+## Unreleased — 2026-06-21 (CC finance on both emails)
+
+- The **payment-instructions email** (sent when someone registers on
+  `omc-registration-june22.html`) and the **payment-proof acknowledgement email**
+  (sent after they upload their receipt on `omc-payment.html`) are now **CC'd to
+  `fica.treasury@gmail.com` and `yennychandra@fica.org`**. This gives finance a
+  copy of what each registrant was told — the amount due, Zelle/Venmo details and
+  reference at registration, and the "proof received, under review" note after
+  upload — so they can follow up if someone doesn't finish paying. The CC list is
+  the new `FINANCE_CC` constant near the top of `google-apps-script.gs`.
+- The **payment-instructions email** now also includes a **"Complete your payment
+  & upload your receipt"** button that deep-links back to `omc-payment.html` with
+  the registrant's details pre-filled (registration ID, amount, name, email,
+  category, and payment reference), so if they don't finish in one sitting they
+  can return straight to the payment + upload step from the email — the amount,
+  Zelle/Venmo details and reference all reappear. (Individual / early-bird flow.)
+- The **Phone** field is now labelled **"Phone (WhatsApp)"** on both the live
+  early-bird form and the July backup form, to signal it's used for WhatsApp
+  contact. (Label text only — nothing else about the field changed.)
+- The **payments Drive folder is now configured** (`PAYMENTS_FOLDER_ID` in
+  `google-apps-script.gs`), so uploaded receipts/student IDs land in a specific
+  folder you control. **Re-deploy the script** for this to take effect.
+- **Setup instructions now cover hosting on WordPress / cPanel** — upload the
+  pages as static files into their own sub-folder (not as a WordPress Page), and
+  clarified that the Drive folder for receipts is separate from web hosting.
+- **Fixed the "Complete your payment" button (and QR images) not being clickable
+  in the email.** They are now built from a single configurable `SITE_BASE_URL`
+  in `google-apps-script.gs` (the public folder where the pages are hosted),
+  instead of from whatever page a registration happened to be submitted from. A
+  test registration done from a local `file://` page no longer produces a
+  dead/unclickable email link — set `SITE_BASE_URL` to your hosted address and
+  the links always work. Added a `runDriveAuthCheck()` helper too, to authorize
+  Drive and verify the payments folder ID from the editor.
+
+## Unreleased — 2026-06-20 (early-bird form + payment upload flow)
+
+### Two form versions
+- `omc-registration-june22.html` is the new **early-bird registration form** that
+  goes live now. `omc-registration-july20.html` is an unchanged backup copy of
+  the previous form for the later period. The original `omc-registration.html`
+  is untouched.
+
+### Early-bird registration form changes (`omc-registration-june22.html`)
+- **Individual only** — removed the group (5+) option and the referral / voucher
+  fields for the early-bird season.
+- **Phone**, **City**, **State**, and **Dietary requirements** are now **required**
+  (City and State are separate fields and sheet columns), and a new **School /
+  company** field was added.
+- Google Sheet structure is unchanged (Registrations + Ticket Orders + TShirt
+  Orders + Payments); early-bird registrations are **individual tickets only**.
+- Reworked pricing into two clear tickets per attendee type:
+  - **Full Package** — conference, accommodation, meals.
+  - **Conference Entry Ticket** — conference only.
+  Each shows the discounted price with the regular price struck through. Prices:
+  Student $190 / $140, Professional $260 / $190 (regular: $220 / $170 and
+  $290 / $220). Wording now reads "Price increases July 12 · Registration ends
+  August 20" instead of "early bird / regular".
+- The in-form fish quiz was removed (it now lives on the thank-you page).
+
+### New payment + thank-you pages
+- After registering, attendees go to a new **payment page** (`omc-payment.html`)
+  showing the amount due, Zelle/Venmo details + QR codes, and an upload for their
+  **payment receipt** (plus a **student ID** upload for student tickets).
+- Submitting the proof saves the files to a **Google Drive folder**, logs a row
+  in a new **"Payments"** sheet, and emails the attendee an acknowledgement that
+  their payment is under review.
+- A new **thank-you page** (`omc-thankyou.html`) then invites them to take the
+  FICA "What Fish Are You?" quiz.
+
 ## Unreleased — 2026-06-20 (since "group registration, tiered pricing, payments")
 
 ### New for registrants

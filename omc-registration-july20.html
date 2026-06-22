@@ -1,0 +1,1692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OMC 2026 — Registration</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy: #1a2640;
+      --navy-light: #2b3d5c;
+      --gold: #c9a84c;
+      --gold-light: #e8c97a;
+      --cream: #faf8f4;
+      --white: #ffffff;
+      --muted: #6b7280;
+      --border: #e5e0d8;
+      --radius: 8px;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--cream);
+      color: var(--navy);
+      min-height: 100vh;
+    }
+
+    /* Header */
+    .site-header {
+      background: var(--navy);
+      padding: 1.25rem 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .site-header img {
+      height: 36px;
+      width: auto;
+      filter: brightness(0) invert(1);
+      opacity: 0.9;
+    }
+    .site-header .org-name {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 400;
+      color: rgba(255,255,255,0.7);
+      letter-spacing: 0.06em;
+    }
+
+    /* Hero banner */
+    .hero {
+      background: var(--navy);
+      padding: 3.5rem 2rem 3rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 0%, rgba(201,168,76,0.12) 0%, transparent 65%);
+      pointer-events: none;
+    }
+    .hero-eyebrow {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.75rem;
+    }
+    .hero h1 {
+      font-family: 'Lora', serif;
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 500;
+      color: var(--white);
+      line-height: 1.15;
+      margin-bottom: 0.75rem;
+    }
+    .hero-sub {
+      font-size: 14px;
+      color: rgba(255,255,255,0.55);
+      max-width: 420px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+    .hero-divider {
+      width: 36px;
+      height: 1px;
+      background: var(--gold);
+      margin: 1.5rem auto 0;
+      opacity: 0.6;
+    }
+
+    /* Form container */
+    .page-wrap {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem 4rem;
+    }
+
+    .card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+      margin-bottom: 1.25rem;
+    }
+    .card-title {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1.25rem;
+    }
+
+    /* Fields */
+    .field { margin-bottom: 1.1rem; }
+    .field:last-child { margin-bottom: 0; }
+    .field label {
+      display: block;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 5px;
+    }
+    .field input,
+    .field select,
+    .field textarea {
+      width: 100%;
+      padding: 10px 13px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      color: var(--navy);
+      background: var(--cream);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      appearance: none;
+    }
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus {
+      border-color: var(--navy-light);
+      box-shadow: 0 0 0 3px rgba(26,38,64,0.08);
+      background: var(--white);
+    }
+    .field textarea { resize: vertical; min-height: 72px; line-height: 1.6; }
+    .field select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7280' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 36px;
+      cursor: pointer;
+    }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 480px) { .row { grid-template-columns: 1fr; } }
+
+    /* Ticket options */
+    .ticket-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    @media (max-width: 480px) { .ticket-grid { grid-template-columns: 1fr; } }
+    .ticket {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 13px 14px;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+      background: var(--cream);
+    }
+    .ticket:hover { border-color: var(--navy-light); }
+    .ticket.selected {
+      border-color: var(--navy);
+      background: var(--white);
+      box-shadow: inset 0 0 0 1px var(--navy);
+    }
+    .ticket input { display: none; }
+    .ticket .t-name { font-size: 13px; font-weight: 500; color: var(--navy); }
+    .ticket .t-price { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .ticket .t-badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      background: var(--gold-light);
+      color: #7a5a00;
+      padding: 2px 7px;
+      border-radius: 4px;
+      margin-top: 5px;
+    }
+
+    /* Pricing info */
+    .pricing-info {
+      background: var(--cream);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem 1.15rem;
+      margin-bottom: 1.25rem;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .pricing-info h3 {
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--navy);
+      margin-bottom: 0.5rem;
+    }
+    .pricing-schedule {
+      list-style: none;
+      margin-bottom: 1rem;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .pricing-schedule li + li { margin-top: 0.2rem; }
+    .pricing-schedule strong { color: var(--navy); font-weight: 500; }
+    .pricing-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+    .pricing-table th,
+    .pricing-table td {
+      padding: 7px 8px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    .pricing-table th {
+      font-weight: 500;
+      color: var(--muted);
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .pricing-table tr:last-child td { border-bottom: none; }
+    .pricing-table td:first-child { font-weight: 500; color: var(--navy); }
+    .pricing-period-badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      background: var(--gold-light);
+      color: #7a5a00;
+      padding: 3px 8px;
+      border-radius: 4px;
+      margin-bottom: 0.75rem;
+    }
+    .ticket-section-label {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .ticket-section-label + .ticket-grid { margin-bottom: 1.1rem; }
+    .selected-price-box {
+      background: var(--navy);
+      color: var(--white);
+      border-radius: var(--radius);
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 0.25rem;
+    }
+    .selected-price-box .sp-label { font-size: 12px; opacity: 0.75; }
+    .selected-price-box .sp-amount {
+      font-family: 'Lora', serif;
+      font-size: 20px;
+      font-weight: 500;
+    }
+
+    /* Checkboxes */
+    .check-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 0.75rem;
+    }
+    .check-row:last-child { margin-bottom: 0; }
+    .check-row input[type=checkbox] {
+      width: 16px; height: 16px;
+      margin-top: 2px;
+      flex-shrink: 0;
+      accent-color: var(--navy);
+      cursor: pointer;
+    }
+    .check-row span {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+    .check-row a { color: var(--navy); }
+
+    /* Submit */
+    .submit-area { margin-top: 1.5rem; }
+    .submit-btn {
+      width: 100%;
+      padding: 13px;
+      background: var(--navy);
+      color: var(--white);
+      border: none;
+      border-radius: var(--radius);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 0.03em;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+    }
+    .submit-btn:hover { background: var(--navy-light); }
+    .submit-btn:active { transform: scale(0.99); }
+    .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .submit-note {
+      text-align: center;
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 0.75rem;
+      line-height: 1.5;
+    }
+
+    /* Error / success states */
+    .field-error {
+      font-size: 11px;
+      color: #c0392b;
+      margin-top: 4px;
+      display: none;
+    }
+    .field.has-error input,
+    .field.has-error select,
+    .field.has-error textarea {
+      border-color: #c0392b;
+    }
+    .field.has-error .field-error { display: block; }
+
+    .status-msg {
+      display: none;
+      text-align: center;
+      padding: 12px 16px;
+      border-radius: var(--radius);
+      font-size: 13px;
+      margin-bottom: 1rem;
+    }
+    .status-msg.error { background: #fdf0ef; color: #c0392b; border: 1px solid #f5c6c2; display: block; }
+    .status-msg.success { background: #eef6f1; color: #1a7a42; border: 1px solid #b8dfc8; display: block; }
+
+    /* Success screen */
+    #success-view { display: none; text-align: center; padding: 3rem 1rem; }
+    .success-icon {
+      width: 52px; height: 52px;
+      border: 1.5px solid var(--navy);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 1.25rem;
+      font-size: 22px;
+    }
+    #success-view h2 {
+      font-family: 'Lora', serif;
+      font-size: 22px;
+      font-weight: 500;
+      color: var(--navy);
+      margin-bottom: 0.5rem;
+    }
+    #success-view p { font-size: 14px; color: var(--muted); line-height: 1.7; }
+
+    /* Path selector */
+    .path-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    @media (max-width: 480px) { .path-grid { grid-template-columns: 1fr; } }
+
+    /* Group quantities */
+    .qty-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .qty-row:last-child { border-bottom: none; }
+    .qty-row .qty-label { font-size: 13px; color: var(--navy); font-weight: 500; }
+    .qty-row .qty-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .qty-stepper { display: flex; align-items: center; gap: 8px; }
+    .qty-stepper button {
+      width: 28px; height: 28px;
+      border: 1px solid var(--border);
+      background: var(--cream);
+      border-radius: 6px;
+      font-size: 16px;
+      color: var(--navy);
+      cursor: pointer;
+      line-height: 1;
+    }
+    .qty-stepper button:hover { border-color: var(--navy-light); }
+    .qty-stepper input {
+      width: 46px; text-align: center;
+      padding: 6px; font-size: 14px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--white);
+      color: var(--navy);
+    }
+    .qty-price { color: var(--navy); font-weight: 600; font-size: 12px; margin-left: 4px; }
+    .group-hint {
+      font-size: 12px; color: var(--muted);
+      margin-top: 0.85rem; line-height: 1.5;
+    }
+    .group-hint.warn { color: #c0392b; }
+    .group-total {
+      margin-top: 1rem;
+      background: var(--navy);
+      color: var(--white);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+    }
+    .gt-line {
+      display: flex; justify-content: space-between; align-items: baseline;
+      font-size: 13px; color: rgba(255,255,255,0.7); padding: 5px 0;
+    }
+    .gt-line span:last-child { color: var(--white); font-weight: 500; }
+    .gt-line.gt-total {
+      border-top: 1px solid rgba(255,255,255,0.2);
+      margin-top: 4px; padding-top: 10px;
+    }
+    .gt-line.gt-total span { font-size: 18px; color: var(--white); font-weight: 600; }
+
+    /* Group member banner */
+    .member-banner {
+      background: var(--navy);
+      color: var(--white);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 1.25rem;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+    .member-banner strong { color: var(--gold-light); }
+
+    /* Payment instructions */
+    .pay-box {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-align: left;
+      margin: 1.5rem auto 0;
+      max-width: 420px;
+    }
+    .pay-amount {
+      font-family: 'Lora', serif;
+      font-size: 30px;
+      color: var(--navy);
+      text-align: center;
+    }
+    .pay-amount-label {
+      text-align: center; font-size: 11px;
+      text-transform: uppercase; letter-spacing: 0.08em;
+      color: var(--muted); margin-bottom: 1.25rem;
+    }
+    .pay-method {
+      display: flex; justify-content: space-between; align-items: center;
+      gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--border);
+    }
+    .pay-method:last-of-type { border-bottom: none; }
+    .pay-method .pm-label { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; }
+    .pay-method .pm-value { font-weight: 500; color: var(--navy); font-size: 14px; }
+    .pay-ref {
+      background: var(--cream);
+      border: 1px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 10px 12px;
+      font-size: 13px;
+      margin-top: 1rem;
+      color: var(--navy);
+      line-height: 1.5;
+    }
+    #success-view .pay-next { font-size: 12px; color: var(--muted); margin-top: 1rem; line-height: 1.6; }
+    .pay-qr { display: flex; gap: 14px; justify-content: center; margin: 1.1rem 0 0.25rem; }
+    .pay-qr figure { text-align: center; flex: 1; max-width: 150px; margin: 0; }
+    .pay-qr img {
+      width: 100%; height: auto; display: block;
+      border: 1px solid var(--border); border-radius: var(--radius);
+      background: #fff; padding: 6px;
+    }
+    .pay-qr figcaption {
+      font-size: 11px; color: var(--muted); margin-top: 5px;
+      text-transform: uppercase; letter-spacing: 0.06em;
+    }
+
+    /* T-shirt order */
+    .tshirt-options-img {
+      width: 100%; max-width: 360px; display: block; margin: 0.25rem auto 1.1rem;
+      border: 1px solid var(--border); border-radius: var(--radius);
+    }
+    .tshirt-matrix { width: 100%; border-collapse: collapse; margin-top: 0.4rem; }
+    .tshirt-matrix th, .tshirt-matrix td {
+      padding: 8px 6px; text-align: center;
+      border-bottom: 1px solid var(--border); color: var(--navy); font-size: 13px;
+    }
+    .tshirt-matrix th {
+      font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em;
+      color: var(--muted); font-weight: 600;
+    }
+    .tshirt-matrix td:first-child, .tshirt-matrix th:first-child { text-align: left; font-weight: 600; }
+    .tshirt-matrix input {
+      width: 54px; text-align: center; padding: 6px; font-size: 14px;
+      border: 1px solid var(--border); border-radius: 6px;
+      background: var(--white); color: var(--navy);
+    }
+    details.size-guide { margin-top: 0.85rem; }
+    details.size-guide summary {
+      cursor: pointer; font-size: 12px; color: var(--navy); font-weight: 500;
+    }
+    .size-chart { width: 100%; border-collapse: collapse; margin: 0.6rem 0 0.25rem; }
+    .size-chart caption { font-size: 11px; color: var(--muted); margin-bottom: 6px; text-align: left; }
+    .size-chart th, .size-chart td {
+      padding: 6px 8px; text-align: center; font-size: 12px;
+      border: 1px solid var(--border); color: var(--navy);
+    }
+    .size-chart th {
+      background: var(--cream); font-weight: 600; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.04em; font-size: 11px;
+    }
+
+    /* Order summary (ticket + t-shirt) */
+    .order-summary {
+      background: var(--navy); color: var(--white);
+      border-radius: var(--radius); padding: 16px 18px; margin-top: 0.25rem;
+    }
+    .order-summary .os-line {
+      display: flex; justify-content: space-between; align-items: baseline;
+      font-size: 13px; color: rgba(255,255,255,0.72); padding: 5px 0; gap: 12px;
+    }
+    .order-summary .os-line span:last-child { color: var(--white); font-weight: 500; }
+    .order-summary .os-total {
+      border-top: 1px solid rgba(255,255,255,0.2); margin-top: 6px; padding-top: 10px;
+    }
+    .order-summary .os-total span { font-size: 18px; color: var(--white); font-weight: 600; }
+
+    /* FICA quiz call-to-action */
+    .quiz-cta {
+      display: inline-block; margin-top: 0.65rem;
+      background: var(--gold); color: var(--navy);
+      text-decoration: none; font-weight: 600; font-size: 14px;
+      padding: 10px 20px; border-radius: 999px;
+    }
+    .quiz-cta:hover { background: var(--gold-light); }
+    .quiz-box {
+      background: var(--cream); border: 1px solid var(--border);
+      border-radius: 12px; padding: 1.25rem; max-width: 420px;
+      margin: 1.25rem auto 0; text-align: center;
+    }
+    .quiz-box h3 {
+      font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em;
+      color: var(--navy); margin-bottom: 0.5rem;
+    }
+    #success-view .quiz-box p { font-size: 13px; color: var(--muted); margin-bottom: 0; line-height: 1.5; }
+
+    /* Share link (group lead) */
+    .share-box {
+      background: var(--cream);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem;
+      max-width: 420px;
+      margin: 1.25rem auto 0;
+      text-align: left;
+    }
+    .share-box h3 {
+      font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em;
+      color: var(--navy); margin-bottom: 0.5rem;
+    }
+    #success-view .share-box p { font-size: 12px; color: var(--muted); margin-bottom: 0.75rem; line-height: 1.5; }
+    .share-link-row { display: flex; gap: 8px; }
+    .share-link-row input {
+      flex: 1; min-width: 0; padding: 9px 11px; font-size: 12px;
+      border: 1px solid var(--border); border-radius: var(--radius);
+      background: var(--white); color: var(--navy);
+    }
+    .copy-btn {
+      padding: 9px 14px; font-size: 12px; font-weight: 500;
+      background: var(--navy); color: var(--white);
+      border: none; border-radius: var(--radius); cursor: pointer;
+      white-space: nowrap;
+    }
+    .copy-btn:hover { background: var(--navy-light); }
+
+    /* Honeypot — hidden anti-spam field. Real users never see or focus it;
+       bots that auto-fill every field reveal themselves by filling it. */
+    .hp-field {
+      position: absolute !important;
+      left: -9999px !important;
+      top: -9999px !important;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      opacity: 0;
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 2rem;
+      font-size: 12px;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="org-name">Fellowship of Indonesian Christians in America</div>
+  </header>
+
+  <div class="hero">
+    <p class="hero-eyebrow">Overseas Mission Conference · 2026</p>
+    <h1>Register for OMC 2026</h1>
+    <p class="hero-sub">Filled to Overflow — join us as we gather, grow, and go together.</p>
+    <div class="hero-divider"></div>
+  </div>
+
+  <div class="page-wrap">
+
+    <div id="status-msg" class="status-msg"></div>
+
+    <div id="form-view">
+
+      <!-- Honeypot: hidden from humans, a spam trap. Leave blank. -->
+      <div class="hp-field" aria-hidden="true">
+        <label for="hp-website">Website</label>
+        <input type="text" id="hp-website" name="website" tabindex="-1" autocomplete="off" />
+      </div>
+
+      <!-- Group member banner (shown when arriving via a group link) -->
+      <div class="member-banner" id="member-banner" hidden></div>
+
+      <!-- Registration path -->
+      <div class="card" id="path-card">
+        <p class="card-title">How are you registering?</p>
+        <div class="ticket-grid path-grid" id="path-group">
+          <div class="ticket selected" data-path="individual">
+            <input type="radio" name="path" value="individual" checked />
+            <div class="t-name">Just me</div>
+            <div class="t-price">Individual registration</div>
+          </div>
+          <div class="ticket" data-path="group">
+            <input type="radio" name="path" value="group" />
+            <div class="t-name">A group (5+)</div>
+            <div class="t-price">$10 off each person</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Personal info -->
+      <div class="card">
+        <p class="card-title">Personal details</p>
+
+        <div class="row">
+          <div class="field" id="f-firstname">
+            <label>First name *</label>
+            <input type="text" name="firstName" placeholder="First name" />
+            <p class="field-error">Please enter your first name.</p>
+          </div>
+          <div class="field" id="f-lastname">
+            <label>Last name *</label>
+            <input type="text" name="lastName" placeholder="Last name" />
+            <p class="field-error">Please enter your last name.</p>
+          </div>
+        </div>
+
+        <div class="field" id="f-email">
+          <label>Email address *</label>
+          <input type="email" name="email" placeholder="you@email.com" />
+          <p class="field-error">Please enter a valid email address.</p>
+        </div>
+
+        <div class="row">
+          <div class="field">
+            <label>Phone (WhatsApp, optional)</label>
+            <input type="tel" name="phone" placeholder="+1 000 000 0000" />
+          </div>
+          <div class="field">
+            <label>City / state</label>
+            <input type="text" name="city" placeholder="e.g. Boston, MA" />
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="field">
+            <label>Church / organisation</label>
+            <input type="text" name="church" placeholder="Church or organisation" />
+          </div>
+          <div class="field">
+            <label>Role / vocation</label>
+            <input type="text" name="role" placeholder="e.g. Student, Pastor" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Ticket -->
+      <div class="card" id="ticket-card">
+        <p class="card-title">Registration &amp; pricing</p>
+
+        <ul class="pricing-schedule">
+          <li><strong>Early bird:</strong> June 22 – July 12</li>
+          <li><strong>Regular:</strong> July 12 – August 20</li>
+        </ul>
+
+        <div class="pricing-info">
+          <h3>Ticket prices (USD)</h3>
+          <table class="pricing-table">
+            <thead>
+              <tr>
+                <th>Category</th>
+                <th>Early bird</th>
+                <th>Early bird w/o accommodation &amp; food</th>
+                <th>Regular</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Student</td>
+                <td>$190</td>
+                <td>$140</td>
+                <td>$220</td>
+              </tr>
+              <tr>
+                <td>Professional</td>
+                <td>$260</td>
+                <td>$190</td>
+                <td>$290</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div id="period-badge" class="pricing-period-badge" hidden></div>
+
+        <!-- Individual ticket selection -->
+        <div id="individual-ticket">
+          <p class="ticket-section-label">Category *</p>
+          <div class="ticket-grid" id="category-group">
+            <div class="ticket selected" data-category="student">
+              <input type="radio" name="category" value="student" checked />
+              <div class="t-name">Student</div>
+              <div class="t-price">Valid student ID required</div>
+            </div>
+            <div class="ticket" data-category="professional">
+              <input type="radio" name="category" value="professional" />
+              <div class="t-name">Professional</div>
+              <div class="t-price">For working professionals</div>
+            </div>
+          </div>
+
+          <p class="ticket-section-label">Package *</p>
+          <div class="ticket-grid" id="package-group">
+            <div class="ticket selected" data-package="full">
+              <input type="radio" name="package" value="full" checked />
+              <div class="t-name">Full registration</div>
+              <div class="t-price">Includes accommodation &amp; food</div>
+            </div>
+            <div class="ticket" data-package="no-acc">
+              <input type="radio" name="package" value="no-acc" />
+              <div class="t-name">Without accommodation &amp; food</div>
+              <div class="t-price" id="no-acc-price-hint">$140 · Student</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Group lead selection -->
+        <div id="group-ticket" hidden>
+          <p class="group-hint" style="margin-top:0;">Your group will be given an automatic name (group-1, group-2, ...) and a shareable link once you register.</p>
+
+          <p class="ticket-section-label">How many people? (5+ total)</p>
+          <div class="qty-list">
+            <div class="qty-row">
+              <div>
+                <div class="qty-label">Student — full <span class="qty-price" id="price-qtyStudentFull"></span></div>
+                <div class="qty-sub">Accommodation &amp; food</div>
+              </div>
+              <div class="qty-stepper">
+                <button type="button" data-step="-1" data-qty="qtyStudentFull">−</button>
+                <input type="number" id="qtyStudentFull" name="qtyStudentFull" value="0" min="0" inputmode="numeric" />
+                <button type="button" data-step="1" data-qty="qtyStudentFull">+</button>
+              </div>
+            </div>
+            <div class="qty-row">
+              <div>
+                <div class="qty-label">Student — no accommodation <span class="qty-price" id="price-qtyStudentNoAcc"></span></div>
+                <div class="qty-sub">Without accommodation &amp; food</div>
+              </div>
+              <div class="qty-stepper">
+                <button type="button" data-step="-1" data-qty="qtyStudentNoAcc">−</button>
+                <input type="number" id="qtyStudentNoAcc" name="qtyStudentNoAcc" value="0" min="0" inputmode="numeric" />
+                <button type="button" data-step="1" data-qty="qtyStudentNoAcc">+</button>
+              </div>
+            </div>
+            <div class="qty-row">
+              <div>
+                <div class="qty-label">Professional — full <span class="qty-price" id="price-qtyProFull"></span></div>
+                <div class="qty-sub">Accommodation &amp; food</div>
+              </div>
+              <div class="qty-stepper">
+                <button type="button" data-step="-1" data-qty="qtyProFull">−</button>
+                <input type="number" id="qtyProFull" name="qtyProFull" value="0" min="0" inputmode="numeric" />
+                <button type="button" data-step="1" data-qty="qtyProFull">+</button>
+              </div>
+            </div>
+            <div class="qty-row">
+              <div>
+                <div class="qty-label">Professional — no accommodation <span class="qty-price" id="price-qtyProNoAcc"></span></div>
+                <div class="qty-sub">Without accommodation &amp; food</div>
+              </div>
+              <div class="qty-stepper">
+                <button type="button" data-step="-1" data-qty="qtyProNoAcc">−</button>
+                <input type="number" id="qtyProNoAcc" name="qtyProNoAcc" value="0" min="0" inputmode="numeric" />
+                <button type="button" data-step="1" data-qty="qtyProNoAcc">+</button>
+              </div>
+            </div>
+          </div>
+          <p class="group-hint" id="group-hint">Add at least 5 people to qualify for the group rate.</p>
+
+          <div class="group-total" id="group-total" hidden>
+            <div class="gt-line"><span>Subtotal (before discount)</span><span id="gt-subtotal">$0</span></div>
+            <div class="gt-line"><span id="gt-discount-label">Group discount</span><span id="gt-discount">−$0</span></div>
+            <div class="gt-line gt-total"><span>Total (after discount)</span><span id="gt-total-amount">$0</span></div>
+          </div>
+        </div>
+
+        <div class="selected-price-box" id="selected-price-box">
+          <span class="sp-label" id="selected-price-label">Your selected ticket</span>
+          <span class="sp-amount" id="selected-price-amount">$190</span>
+        </div>
+      </div>
+
+      <!-- Additional -->
+      <div class="card">
+        <p class="card-title">A few more details</p>
+
+        <div class="field">
+          <label>Dietary requirements</label>
+          <input type="text" name="dietary" placeholder="e.g. vegetarian, gluten-free, none" />
+        </div>
+
+        <div class="field">
+          <label>How did you hear about OMC 2026?</label>
+          <select name="referral">
+            <option value="" disabled selected>Select one</option>
+            <option>FICA community / church</option>
+            <option>Friend or colleague</option>
+            <option>Social media</option>
+            <option>Email newsletter</option>
+            <option>FICA website</option>
+            <option>Previous OMC attendee</option>
+            <option>Other</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Referred by — name (optional)</label>
+          <input type="text" name="referredByName" placeholder="Who invited you?" />
+        </div>
+        <div class="field">
+          <label>Referred by — email (optional)</label>
+          <input type="email" name="referredByEmail" placeholder="their@email.com" />
+        </div>
+        <p class="group-hint">Invited by a friend? You and the person who referred you each receive a $10 merchandise voucher (up to 2 referrals each).</p>
+
+        <div class="field" style="margin-top:1.1rem;">
+          <label>Anything else you'd like us to know? (optional)</label>
+          <textarea name="notes" placeholder="Accessibility needs, questions, etc."></textarea>
+        </div>
+      </div>
+
+      <!-- T-shirt -->
+      <div class="card" id="tshirt-card">
+        <p class="card-title">OMC 2026 t-shirt</p>
+        <p class="group-hint" style="margin-top:0;">Take home the "Filled to Overflow" tee — $25 each, available in white and blue.</p>
+
+        <img class="tshirt-options-img" src="t-shirt/Tshirt%20Options.jpeg" alt="OMC 2026 'Filled to Overflow' t-shirt designs in blue and white" />
+
+        <p class="ticket-section-label">Would you like to order a t-shirt?</p>
+        <div class="ticket-grid" id="tshirt-toggle-group">
+          <div class="ticket selected" data-tshirt="no">
+            <input type="radio" name="tshirtChoice" value="no" checked />
+            <div class="t-name">No thanks</div>
+            <div class="t-price">Skip the t-shirt</div>
+          </div>
+          <div class="ticket" data-tshirt="yes">
+            <input type="radio" name="tshirtChoice" value="yes" />
+            <div class="t-name">Yes, add t-shirts</div>
+            <div class="t-price">$25 each</div>
+          </div>
+        </div>
+
+        <div id="tshirt-detail" hidden>
+          <p class="ticket-section-label" style="margin-top:1.25rem;">Quantity per colour &amp; size</p>
+          <table class="tshirt-matrix">
+            <thead>
+              <tr><th>Size</th><th>White</th><th>Blue</th></tr>
+            </thead>
+            <tbody id="tshirt-matrix-body"><!-- rows injected by JS --></tbody>
+          </table>
+
+          <details class="size-guide">
+            <summary>View size chart (cm)</summary>
+            <table class="size-chart">
+              <caption>A = half-chest width (flat) · B = body length</caption>
+              <thead><tr><th>Size</th><th>A (cm)</th><th>B (cm)</th></tr></thead>
+              <tbody>
+                <tr><td>S</td><td>48</td><td>67</td></tr>
+                <tr><td>M</td><td>50</td><td>69</td></tr>
+                <tr><td>L</td><td>52</td><td>71</td></tr>
+                <tr><td>XL</td><td>54</td><td>73</td></tr>
+                <tr><td>XXL</td><td>56</td><td>75</td></tr>
+                <tr><td>3XL</td><td>58</td><td>77</td></tr>
+              </tbody>
+            </table>
+          </details>
+
+          <p class="group-hint" id="tshirt-hint">Enter a quantity for the colours and sizes you want.</p>
+        </div>
+      </div>
+
+      <!-- Consent -->
+      <div class="card">
+        <p class="card-title">Consent</p>
+        <div class="check-row">
+          <input type="checkbox" id="terms" />
+          <span>I agree to the <a href="https://fica.org" target="_blank">terms &amp; conditions</a> and FICA's privacy policy. *</span>
+        </div>
+        <div class="check-row">
+          <input type="checkbox" id="updates" />
+          <span>I'd like to receive updates about OMC and future FICA events.</span>
+        </div>
+      </div>
+
+      <!-- Order summary -->
+      <div class="card" id="summary-card">
+        <p class="card-title">Order summary</p>
+        <div class="order-summary" id="order-summary"></div>
+      </div>
+
+      <!-- FICA quiz -->
+      <div class="card" id="quiz-card">
+        <p class="card-title">Before you go — what fish are you?</p>
+        <p class="group-hint" style="margin-top:0;">Take FICA's quick "What Fish Are You?" quiz — a fun way to start your OMC 2026 journey. It only takes a minute.</p>
+        <a class="quiz-cta" href="https://omc2026fishquiz.netlify.app" target="_blank" rel="noopener">Take the quiz</a>
+      </div>
+
+      <div class="submit-area">
+        <button class="submit-btn" id="submit-btn" onclick="submitForm()">Complete registration</button>
+        <p class="submit-note">Your information is stored securely and will only be used for OMC 2026 planning.</p>
+      </div>
+
+    </div><!-- /form-view -->
+
+    <!-- Success screen -->
+    <div id="success-view">
+      <div class="success-icon">✓</div>
+      <h2 id="success-title">You're registered!</h2>
+      <p id="success-message"></p>
+
+      <!-- Payment instructions (individual & group lead) -->
+      <div class="pay-box" id="pay-box" hidden>
+        <div class="pay-amount" id="pay-amount">$0</div>
+        <div class="pay-amount-label">Amount due</div>
+        <div class="pay-method">
+          <span class="pm-label">Zelle</span>
+          <span class="pm-value" id="pay-zelle"></span>
+        </div>
+        <div class="pay-method">
+          <span class="pm-label">Venmo</span>
+          <span class="pm-value" id="pay-venmo"></span>
+        </div>
+        <div class="pay-qr">
+          <figure>
+            <img src="payment barcode/FICA Zelle.jpeg" alt="Zelle QR code" />
+            <figcaption>Scan for Zelle</figcaption>
+          </figure>
+          <figure>
+            <img src="payment barcode/FICA Venmo.jpeg" alt="Venmo QR code" />
+            <figcaption>Scan for Venmo</figcaption>
+          </figure>
+        </div>
+        <div class="pay-ref">
+          Include this reference with your payment:<br />
+          <strong id="pay-ref-value"></strong>
+        </div>
+        <p class="pay-next">Once we receive your payment we'll confirm your spot by email within 3 business days. A copy of these instructions has also been emailed to you.</p>
+      </div>
+
+      <!-- Shareable group link (group lead only) -->
+      <div class="share-box" id="share-box" hidden>
+        <h3>Invite your group</h3>
+        <p>Share this link with the rest of your group. Each person fills in their own details — they won't be asked to pay (you've already covered them).</p>
+        <div class="share-link-row">
+          <input type="text" id="share-link" readonly />
+          <button class="copy-btn" id="copy-link-btn" type="button">Copy</button>
+        </div>
+      </div>
+
+      <!-- FICA quiz (shown to everyone) -->
+      <div class="quiz-box" id="quiz-box">
+        <h3>Haven't taken the quiz yet?</h3>
+        <p>Discover which fish you are with FICA's "What Fish Are You?" quiz.</p>
+        <a class="quiz-cta" href="https://omc2026fishquiz.netlify.app" target="_blank" rel="noopener">Take the quiz</a>
+      </div>
+    </div>
+
+  </div><!-- /page-wrap -->
+
+  <footer class="footer">
+    © 2026 Fellowship of Indonesian Christians in America · <a href="https://fica.org" style="color:inherit">fica.org</a>
+  </footer>
+
+  <script>
+    // ──────────────────────────────────────────────────────────
+    // STEP 1: Paste your Google Apps Script Web App URL here after
+    // deploying it (see SETUP-INSTRUCTIONS.md). It looks like:
+    // https://script.google.com/macros/s/AKfy..../exec
+    // ──────────────────────────────────────────────────────────
+    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwDnHgIAUSzPXTOh8vIZMqfjoG_2TQeolvSpcSXsNyjTzbC_UlvWxL3MPhLFibO5tnb/exec';
+
+    // Payment details shown on the success screen (rev1: Zelle/Venmo).
+    // Fill these in with your real handles before handing off to IT.
+    // Keep these in sync with the same constants in google-apps-script.gs.
+    const PAYMENT = {
+      zelle: 'fica.treasury@gmail.com',   // Zelle email
+      venmo: '@givetofica'                // Venmo handle
+    };
+
+    // Group discount: $10 off per person for groups of this size or larger.
+    const GROUP_MIN = 5;
+    const GROUP_DISCOUNT_PER_PERSON = 10;
+
+    // T-shirts: flat price each, two colours, six sizes (see size chart in form).
+    const TSHIRT_PRICE = 25;
+    const TSHIRT_SIZES = ['S', 'M', 'L', 'XL', 'XXL', '3XL'];
+    const TSHIRT_COLORS = [{ key: 'white', label: 'White' }, { key: 'blue', label: 'Blue' }];
+
+    // Detect group-member mode from the URL (?group=CODE). Members fill in their
+    // own details and don't pay — their group lead already covered them.
+    const urlParams = new URLSearchParams(window.location.search);
+    const memberGroupCode = (urlParams.get('group') || '').trim();
+    let registrationType = memberGroupCode ? 'group-member' : 'individual';
+    let activeGroupCode = memberGroupCode || '';
+
+    const PRICING = {
+      student:      { earlyBird: 190, regular: 220, noAcc: 140 },
+      professional: { earlyBird: 260, regular: 290, noAcc: 190 }
+    };
+
+    const REGISTRATION = {
+      // Opened early for testing. Set back to '2026-06-22T00:00:00' for launch.
+      open: new Date('2026-01-01T00:00:00'),
+      earlyBirdEnd: new Date('2026-07-11T23:59:59'),
+      close: new Date('2026-08-20T23:59:59')
+    };
+
+    function getPricingPeriod() {
+      const now = new Date();
+      if (now < REGISTRATION.open) return 'not-open';
+      if (now > REGISTRATION.close) return 'closed';
+      if (now <= REGISTRATION.earlyBirdEnd) return 'early-bird';
+      return 'regular';
+    }
+
+    function getSelectedCategory() {
+      return document.querySelector('#category-group .ticket.selected')?.dataset.category || 'student';
+    }
+
+    function getSelectedPackage() {
+      return document.querySelector('#package-group .ticket.selected')?.dataset.package || 'full';
+    }
+
+    function getTicketPrice(category, pkg, period) {
+      const rates = PRICING[category];
+      if (pkg === 'no-acc') return rates.noAcc;
+      return period === 'early-bird' ? rates.earlyBird : rates.regular;
+    }
+
+    function formatTicketLabel(category, pkg, period, price) {
+      const catLabel = category === 'student' ? 'Student' : 'Professional';
+      const pkgLabel = pkg === 'full'
+        ? (period === 'early-bird' ? 'Early bird (full)' : 'Regular (full)')
+        : 'Without accommodation & food';
+      return `${catLabel} — ${pkgLabel} — $${price}`;
+    }
+
+    // Group lead quantity fields → (category, package) mapping.
+    const QTY_FIELDS = [
+      { id: 'qtyStudentFull',  category: 'student',      pkg: 'full'   },
+      { id: 'qtyStudentNoAcc', category: 'student',      pkg: 'no-acc' },
+      { id: 'qtyProFull',      category: 'professional', pkg: 'full'   },
+      { id: 'qtyProNoAcc',     category: 'professional', pkg: 'no-acc' },
+    ];
+
+    function getQty(id) {
+      const el = document.getElementById(id);
+      const n = el ? parseInt(el.value, 10) : 0;
+      return (isNaN(n) || n < 0) ? 0 : n;
+    }
+
+    function getGroupSize() {
+      return QTY_FIELDS.reduce((sum, f) => sum + getQty(f.id), 0);
+    }
+
+    function getGroupTotal(period) {
+      return getGroupBreakdown(period).total;
+    }
+
+    function getGroupCountsLabel() {
+      return QTY_FIELDS
+        .map(f => ({ f, c: getQty(f.id) }))
+        .filter(x => x.c > 0)
+        .map(x => `${x.c}× ${x.f.category}/${x.f.pkg}`)
+        .join(', ');
+    }
+
+    function updatePricingUI() {
+      updateTicketUI();
+      updateOrderSummary();
+    }
+
+    function updateTicketUI() {
+      const period = getPricingPeriod();
+      const badge = document.getElementById('period-badge');
+      const amountEl = document.getElementById('selected-price-amount');
+      const labelEl = document.getElementById('selected-price-label');
+      const submitBtn = document.getElementById('submit-btn');
+      const locked = (period === 'not-open' || period === 'closed');
+      const lockedText = period === 'closed' ? 'Registration closed' : 'Registration opens June 22';
+
+      badge.hidden = false;
+      badge.textContent = period === 'not-open'
+        ? 'Registration opens June 22, 2026'
+        : period === 'closed'
+          ? 'Registration closed'
+          : (period === 'early-bird' ? 'Early bird pricing · ends July 12' : 'Regular pricing · closes Aug 20');
+
+      if (registrationType === 'group-member') {
+        submitBtn.disabled = locked;
+        submitBtn.textContent = locked ? lockedText : 'Reserve my spot';
+        return;
+      }
+
+      if (registrationType === 'group') {
+        const size = getGroupSize();
+        const enough = size >= GROUP_MIN;
+        const hint = document.getElementById('group-hint');
+
+        // Per-ticket unit prices + subtotal (before discount).
+        let subtotal = 0;
+        QTY_FIELDS.forEach(f => {
+          const unit = getTicketPrice(f.category, f.pkg, period);
+          const priceEl = document.getElementById('price-' + f.id);
+          if (priceEl) priceEl.textContent = `$${unit}`;
+          subtotal += getQty(f.id) * unit;
+        });
+        const discount = size * GROUP_DISCOUNT_PER_PERSON;
+        const total = Math.max(subtotal - discount, 0);
+
+        document.getElementById('gt-subtotal').textContent = `$${subtotal}`;
+        document.getElementById('gt-discount-label').textContent =
+          `Group discount ($${GROUP_DISCOUNT_PER_PERSON} × ${size})`;
+        document.getElementById('gt-discount').textContent = `−$${discount}`;
+        document.getElementById('gt-total-amount').textContent = locked ? '—' : `$${total}`;
+        document.getElementById('group-total').hidden = false;
+
+        if (hint) {
+          hint.classList.toggle('warn', !enough);
+          hint.textContent = enough
+            ? `Group of ${size} · $${GROUP_DISCOUNT_PER_PERSON} off each.`
+            : `Add at least ${GROUP_MIN} people to qualify (currently ${size}).`;
+        }
+
+        submitBtn.disabled = locked || !enough;
+        submitBtn.textContent = locked ? lockedText : 'Continue to payment';
+        return;
+      }
+
+      // Individual
+      const category = getSelectedCategory();
+      const pkg = getSelectedPackage();
+      const price = getTicketPrice(category, pkg, period);
+      const noAccHint = document.getElementById('no-acc-price-hint');
+      noAccHint.textContent = category === 'student'
+        ? `$${PRICING.student.noAcc} · Student`
+        : `$${PRICING.professional.noAcc} · Professional`;
+
+      if (locked) {
+        labelEl.textContent = period === 'closed' ? 'Registration has closed' : 'Registration not yet open';
+        amountEl.textContent = '—';
+        submitBtn.disabled = true;
+        submitBtn.textContent = lockedText;
+        return;
+      }
+
+      const periodNote = period === 'early-bird' && pkg === 'full' ? ' · Early bird rate' : '';
+      labelEl.textContent = formatTicketLabel(category, pkg, period, price).replace(` — $${price}`, '') + periodNote;
+      amountEl.textContent = `$${price}`;
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Continue to payment';
+    }
+
+    // ── T-shirts ──────────────────────────────────────────────
+    function buildTshirtMatrix() {
+      const body = document.getElementById('tshirt-matrix-body');
+      if (!body || body.children.length) return;
+      TSHIRT_SIZES.forEach(size => {
+        const tr = document.createElement('tr');
+        let html = `<td>${size}</td>`;
+        TSHIRT_COLORS.forEach(c => {
+          html += `<td><input type="number" min="0" value="0" inputmode="numeric"`
+                + ` id="ts_${c.key}_${size}" data-ts-color="${c.key}" data-ts-size="${size}" /></td>`;
+        });
+        tr.innerHTML = html;
+        body.appendChild(tr);
+      });
+    }
+
+    function tshirtOrdering() {
+      const sel = document.querySelector('#tshirt-toggle-group .ticket.selected');
+      return !!sel && sel.dataset.tshirt === 'yes';
+    }
+
+    function getTshirtData() {
+      if (!tshirtOrdering()) return { qty: 0, total: 0, summary: '', lines: [] };
+      let qty = 0;
+      const parts = [];
+      const lines = [];
+      TSHIRT_COLORS.forEach(c => {
+        TSHIRT_SIZES.forEach(size => {
+          const el = document.getElementById(`ts_${c.key}_${size}`);
+          const n = el ? Math.max(0, parseInt(el.value, 10) || 0) : 0;
+          if (n > 0) {
+            qty += n;
+            parts.push(`${n}× ${c.label} ${size}`);
+            lines.push({ color: c.label, size: size, quantity: n });
+          }
+        });
+      });
+      return { qty, total: qty * TSHIRT_PRICE, summary: parts.join(', '), lines: lines };
+    }
+
+    // Per-ticket-type line items for the "Ticket Orders" sheet.
+    // Individual: a single line. Group: one line per non-empty quantity field.
+    function getTicketLines(period) {
+      const lines = [];
+      const catLabel = c => (c === 'student' ? 'Student' : 'Professional');
+      if (registrationType === 'group') {
+        QTY_FIELDS.forEach(f => {
+          const qty = getQty(f.id);
+          if (qty > 0) {
+            lines.push({
+              type: catLabel(f.category),
+              accommodation: (f.pkg === 'full'),
+              unitPrice: getTicketPrice(f.category, f.pkg, period),
+              quantity: qty,
+              earlyBird: (period === 'early-bird'),
+            });
+          }
+        });
+      } else if (registrationType !== 'group-member') {
+        const category = getSelectedCategory();
+        const pkg = getSelectedPackage();
+        lines.push({
+          type: catLabel(category),
+          accommodation: (pkg === 'full'),
+          unitPrice: getTicketPrice(category, pkg, period),
+          quantity: 1,
+          earlyBird: (period === 'early-bird'),
+        });
+      }
+      return lines;
+    }
+
+    function updateTshirtHint() {
+      const hint = document.getElementById('tshirt-hint');
+      if (!hint) return;
+      const ts = getTshirtData();
+      hint.textContent = ts.qty > 0
+        ? `${ts.qty} t-shirt${ts.qty > 1 ? 's' : ''} · $${ts.total} — ${ts.summary}`
+        : 'Enter a quantity for the colours and sizes you want.';
+    }
+
+    // Group order breakdown: people count, subtotal (pre-discount), discount, total.
+    function getGroupBreakdown(period) {
+      let subtotal = 0;
+      QTY_FIELDS.forEach(f => {
+        subtotal += getQty(f.id) * getTicketPrice(f.category, f.pkg, period);
+      });
+      const size = getGroupSize();
+      const discount = size * GROUP_DISCOUNT_PER_PERSON;
+      const total = Math.max(subtotal - discount, 0);
+      return { size, subtotal, discount, total };
+    }
+
+    function osLine(label, amount, isTotal) {
+      return `<div class="os-line${isTotal ? ' os-total' : ''}"><span>${label}</span><span>${amount}</span></div>`;
+    }
+
+    function updateOrderSummary() {
+      const box = document.getElementById('order-summary');
+      if (!box) return;
+      const period = getPricingPeriod();
+      const locked = (period === 'not-open' || period === 'closed');
+      const ts = getTshirtData();
+      const money = v => (locked ? '—' : `$${v}`);
+      const rows = [];
+      let ticketCost = 0;
+
+      if (registrationType === 'group') {
+        const b = getGroupBreakdown(period);
+        ticketCost = b.total;
+        rows.push(osLine(`Subtotal (${b.size} ${b.size === 1 ? 'person' : 'people'})`, money(b.subtotal)));
+        rows.push(osLine(`Group discount ($${GROUP_DISCOUNT_PER_PERSON} × ${b.size})`, locked ? '—' : `−$${b.discount}`));
+      } else if (registrationType === 'group-member') {
+        rows.push(osLine('Registration (covered by group lead)', '$0'));
+      } else {
+        ticketCost = getTicketPrice(getSelectedCategory(), getSelectedPackage(), period);
+        rows.push(osLine('Registration', money(ticketCost)));
+      }
+
+      // Itemise each t-shirt (colour + size), then a t-shirt subtotal line.
+      if (ts.lines.length) {
+        ts.lines.forEach(ln => {
+          rows.push(osLine(`T-shirt — ${ln.color} ${ln.size} (${ln.quantity} × $${TSHIRT_PRICE})`, `$${ln.quantity * TSHIRT_PRICE}`));
+        });
+        rows.push(osLine(`Total t-shirts (${ts.qty})`, `$${ts.total}`));
+      }
+
+      rows.push(osLine('Total due', money(ticketCost + ts.total), true));
+      box.innerHTML = rows.join('');
+    }
+
+    function applyMode() {
+      const pathCard = document.getElementById('path-card');
+      const memberBanner = document.getElementById('member-banner');
+      const individualTicket = document.getElementById('individual-ticket');
+      const groupTicket = document.getElementById('group-ticket');
+      const priceBox = document.getElementById('selected-price-box');
+      const ticketCard = document.getElementById('ticket-card');
+
+      if (registrationType === 'group-member') {
+        pathCard.hidden = true;
+        ticketCard.hidden = true;
+        memberBanner.hidden = false;
+        memberBanner.innerHTML = `You're joining group <strong>${activeGroupCode}</strong>. Fill in your details below — your spot is already covered by your group lead, so there's nothing to pay.`;
+      } else if (registrationType === 'group') {
+        memberBanner.hidden = true;
+        ticketCard.hidden = false;
+        individualTicket.hidden = true;
+        groupTicket.hidden = false;
+        priceBox.style.display = 'none';
+      } else {
+        memberBanner.hidden = true;
+        ticketCard.hidden = false;
+        individualTicket.hidden = false;
+        groupTicket.hidden = true;
+        priceBox.style.display = 'flex';
+      }
+      updatePricingUI();
+    }
+
+    function bindTicketGroup(groupId) {
+      document.querySelectorAll(`#${groupId} .ticket`).forEach(t => {
+        t.addEventListener('click', () => {
+          document.querySelectorAll(`#${groupId} .ticket`).forEach(x => x.classList.remove('selected'));
+          t.classList.add('selected');
+          t.querySelector('input').checked = true;
+          updatePricingUI();
+        });
+      });
+    }
+
+    // Path selector
+    document.querySelectorAll('#path-group .ticket').forEach(t => {
+      t.addEventListener('click', () => {
+        document.querySelectorAll('#path-group .ticket').forEach(x => x.classList.remove('selected'));
+        t.classList.add('selected');
+        t.querySelector('input').checked = true;
+        registrationType = t.dataset.path === 'group' ? 'group' : 'individual';
+        applyMode();
+      });
+    });
+
+    // Group quantity steppers
+    document.querySelectorAll('.qty-stepper button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const input = document.getElementById(btn.dataset.qty);
+        const step = parseInt(btn.dataset.step, 10);
+        input.value = Math.max(0, (parseInt(input.value, 10) || 0) + step);
+        updatePricingUI();
+      });
+    });
+    document.querySelectorAll('#group-ticket input[type=number]').forEach(input => {
+      input.addEventListener('input', updatePricingUI);
+    });
+
+    bindTicketGroup('category-group');
+    bindTicketGroup('package-group');
+
+    // T-shirt: build the colour/size grid, then wire the order toggle + inputs.
+    buildTshirtMatrix();
+    document.querySelectorAll('#tshirt-toggle-group .ticket').forEach(t => {
+      t.addEventListener('click', () => {
+        document.querySelectorAll('#tshirt-toggle-group .ticket').forEach(x => x.classList.remove('selected'));
+        t.classList.add('selected');
+        t.querySelector('input').checked = true;
+        document.getElementById('tshirt-detail').hidden = (t.dataset.tshirt !== 'yes');
+        updateTshirtHint();
+        updateOrderSummary();
+      });
+    });
+    document.getElementById('tshirt-matrix-body').addEventListener('input', () => {
+      updateTshirtHint();
+      updateOrderSummary();
+    });
+
+    applyMode();
+
+    function getVal(name) {
+      const el = document.querySelector(`[name="${name}"]`);
+      return el ? el.value.trim() : '';
+    }
+
+    function setError(fieldId, show) {
+      const el = document.getElementById(fieldId);
+      if (el) el.classList.toggle('has-error', show);
+    }
+
+    function showStatus(msg, type) {
+      const el = document.getElementById('status-msg');
+      el.textContent = msg;
+      el.className = 'status-msg ' + type;
+      el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function basePayload(extra) {
+      const wantsUpdates = document.getElementById('updates').checked ? 'Yes' : 'No';
+      const ts = getTshirtData();
+      return Object.assign({
+        timestamp: new Date().toISOString(),
+        firstName: getVal('firstName'),
+        lastName: getVal('lastName'),
+        email: getVal('email'),
+        phone: getVal('phone'),
+        city: getVal('city'),
+        church: getVal('church'),
+        role: getVal('role'),
+        dietary: getVal('dietary'),
+        referral: getVal('referral'),
+        referredByName: getVal('referredByName'),
+        referredByEmail: getVal('referredByEmail'),
+        notes: getVal('notes'),
+        marketingOptIn: wantsUpdates,
+        groupName: '',
+        groupCode: '',
+        groupSize: '',
+        regTicketType: '',
+        ticketBeforeDiscount: 0,
+        ticketDiscount: 0,
+        ticketAfterDiscount: 0,
+        amountDue: '',
+        tshirtOrder: ts.summary,
+        tshirtQty: ts.qty,
+        tshirtTotal: ts.total,
+        ticketLines: [],
+        tshirtLines: ts.lines,
+        baseUrl: location.origin + location.pathname,
+      }, extra);
+    }
+
+    function showSuccess(info) {
+      document.getElementById('form-view').style.display = 'none';
+      document.getElementById('success-view').style.display = 'block';
+
+      const title = document.getElementById('success-title');
+      const message = document.getElementById('success-message');
+      const payBox = document.getElementById('pay-box');
+      const shareBox = document.getElementById('share-box');
+      payBox.hidden = true;
+      shareBox.hidden = true;
+
+      if (info.type === 'group-member') {
+        title.textContent = "You're on the list!";
+        if (info.amount > 0) {
+          message.innerHTML = `Your spot in group <strong>${info.code}</strong> is reserved — your registration is covered by your group lead. You added <strong>$${info.amount}</strong> of t-shirts; please complete payment below to confirm your order.`;
+          document.getElementById('pay-amount').textContent = `$${info.amount}`;
+          document.getElementById('pay-zelle').textContent = PAYMENT.zelle;
+          document.getElementById('pay-venmo').textContent = PAYMENT.venmo;
+          document.getElementById('pay-ref-value').textContent = `${info.code} ${info.name}`;
+          payBox.hidden = false;
+        } else {
+          message.innerHTML = `Your spot in group <strong>${info.code}</strong> is reserved — your group lead has covered your registration. A confirmation has been emailed to you.`;
+        }
+      } else {
+        title.textContent = 'Almost done — please pay to confirm';
+        const hasCode = info.type === 'group-lead' && info.code;
+
+        if (info.type === 'group-lead') {
+          message.innerHTML = hasCode
+            ? `Thanks! Your group <strong>${info.code}</strong> is reserved. Complete payment below to confirm everyone's spot.`
+            : `Thanks! Your group has been created — we've emailed your group name and shareable link. Complete payment below to confirm everyone's spot.`;
+        } else {
+          message.innerHTML = `Thanks for registering for OMC 2026. Complete your payment below to confirm your spot.`;
+        }
+
+        document.getElementById('pay-amount').textContent = `$${info.amount}`;
+        document.getElementById('pay-zelle').textContent = PAYMENT.zelle;
+        document.getElementById('pay-venmo').textContent = PAYMENT.venmo;
+        document.getElementById('pay-ref-value').textContent =
+          hasCode ? `${info.code} ${info.name}` : info.name;
+        payBox.hidden = false;
+
+        if (hasCode) {
+          document.getElementById('share-link').value =
+            `${location.origin}${location.pathname}?group=${encodeURIComponent(info.code)}`;
+          shareBox.hidden = false;
+        }
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    document.getElementById('copy-link-btn').addEventListener('click', () => {
+      const input = document.getElementById('share-link');
+      input.select();
+      if (navigator.clipboard) navigator.clipboard.writeText(input.value);
+      else document.execCommand('copy');
+      const btn = document.getElementById('copy-link-btn');
+      btn.textContent = 'Copied';
+      setTimeout(() => { btn.textContent = 'Copy'; }, 1500);
+    });
+
+    async function submitForm() {
+      // Clear previous errors
+      ['f-firstname','f-lastname','f-email'].forEach(id => setError(id, false));
+      document.getElementById('status-msg').className = 'status-msg';
+
+      // Validate personal fields (all paths)
+      let valid = true;
+      if (!getVal('firstName')) { setError('f-firstname', true); valid = false; }
+      if (!getVal('lastName'))  { setError('f-lastname', true);  valid = false; }
+      const email = getVal('email');
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setError('f-email', true); valid = false; }
+      if (!document.getElementById('terms').checked) {
+        showStatus('Please accept the terms & conditions to continue.', 'error');
+        valid = false;
+      }
+      if (!valid) return;
+
+      // Honeypot: a real user can't see or focus the hidden "website" field,
+      // so if it has a value the submission is almost certainly a bot. Show
+      // the success screen (so the bot doesn't retry) but send nothing.
+      if (getVal('website')) {
+        showSuccess({ type: 'individual', amount: 0, name: '' });
+        return;
+      }
+
+      if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') {
+        showStatus('Form is not connected yet. Please set the Apps Script URL (see SETUP-INSTRUCTIONS.md).', 'error');
+        return;
+      }
+
+      const period = getPricingPeriod();
+      if (period === 'not-open') { showStatus('Registration opens on June 22, 2026.', 'error'); return; }
+      if (period === 'closed') { showStatus('Registration has closed. Contact us if you need assistance.', 'error'); return; }
+
+      const fullName = `${getVal('firstName')} ${getVal('lastName')}`;
+      const tshirt = getTshirtData();
+      const ticketLines = getTicketLines(period);
+      let payload, successInfo;
+
+      if (registrationType === 'group') {
+        const size = getGroupSize();
+        if (size < GROUP_MIN) { showStatus(`Groups need at least ${GROUP_MIN} people. Add more to continue.`, 'error'); return; }
+
+        const b = getGroupBreakdown(period);
+        const total = b.total + tshirt.total;
+        // The group name is assigned by the server (group-1, group-2, ...).
+        // We send our page URL so the script can email a working share link.
+        payload = basePayload({
+          registrationType: 'group-lead',
+          regTicketType: 'Group',
+          ticket: `Group lead — ${getGroupCountsLabel()}`,
+          groupSize: size,
+          ticketBeforeDiscount: b.subtotal,
+          ticketDiscount: b.discount,
+          ticketAfterDiscount: b.total,
+          amountDue: total,
+          ticketLines: ticketLines,
+          baseUrl: location.origin + location.pathname,
+        });
+        successInfo = { type: 'group-lead', amount: total, name: fullName };
+
+      } else if (registrationType === 'group-member') {
+        payload = basePayload({
+          registrationType: 'group-member',
+          regTicketType: 'Group member',
+          ticket: 'Group member (covered by lead)',
+          groupCode: activeGroupCode,
+          ticketBeforeDiscount: 0,
+          ticketDiscount: 0,
+          ticketAfterDiscount: 0,
+          amountDue: tshirt.total,
+          ticketLines: [],
+        });
+        successInfo = { type: 'group-member', code: activeGroupCode, amount: tshirt.total, name: fullName };
+
+      } else {
+        const category = getSelectedCategory();
+        const pkg = getSelectedPackage();
+        const price = getTicketPrice(category, pkg, period);
+        const total = price + tshirt.total;
+        payload = basePayload({
+          registrationType: 'individual',
+          regTicketType: category === 'student' ? 'Student' : 'Professional',
+          ticket: formatTicketLabel(category, pkg, period, price),
+          ticketBeforeDiscount: price,
+          ticketDiscount: 0,
+          ticketAfterDiscount: price,
+          amountDue: total,
+          ticketLines: ticketLines,
+        });
+        successInfo = { type: 'individual', amount: total, name: fullName };
+      }
+
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      btn.textContent = 'Submitting…';
+
+      try {
+        if (registrationType === 'group') {
+          // Group leads need the server-assigned name back, so we use a
+          // readable request. A text/plain body avoids a CORS preflight the
+          // Apps Script can't answer; the script returns JSON with groupCode.
+          let assignedCode = '';
+          try {
+            const res = await fetch(APPS_SCRIPT_URL, {
+              method: 'POST',
+              headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+              body: JSON.stringify(payload),
+            });
+            const json = await res.json();
+            assignedCode = (json && json.groupCode) ? json.groupCode : '';
+          } catch (readErr) {
+            // The row is saved server-side; we just couldn't read the name.
+            // The lead still gets it (and the link) by email.
+            assignedCode = '';
+          }
+          activeGroupCode = assignedCode;
+          successInfo.code = assignedCode;
+          showSuccess(successInfo);
+        } else {
+          // Individual + member: fire-and-forget. Apps Script web apps don't
+          // send CORS headers, so we POST in "no-cors" mode with a text/plain
+          // body (avoids a preflight the script can't answer). We can't read
+          // the response in this mode, so a resolved fetch is treated as success.
+          await fetch(APPS_SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify(payload),
+          });
+          showSuccess(successInfo);
+        }
+      } catch (err) {
+        showStatus('Something went wrong. Please try again or contact us directly.', 'error');
+        btn.disabled = false;
+        updatePricingUI();
+      }
+    }
+  </script>
+
+</body>
+</html>

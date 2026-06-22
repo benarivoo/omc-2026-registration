@@ -91,6 +91,75 @@ the confirmation email.
 > the **Send email as you** permission. Re-run the deploy/authorize flow (Step 3)
 > and click **Allow**. Without this, rows still save but no email is sent.
 
+### `SITE_BASE_URL` — the public address email links are built on
+
+The confirmation email contains a **"Complete your payment & upload your receipt"**
+button (and the embedded Zelle/Venmo QR images), and both are built from
+`SITE_BASE_URL` near the top of `google-apps-script.gs`:
+
+```js
+var SITE_BASE_URL = 'https://benarivoo.github.io/omc-2026-registration/'; // must end in "/"
+```
+
+- Set it to the **public folder where the pages are hosted** (it must end in a
+  slash). On WordPress/cPanel that's e.g. `https://yourdomain.com/omc2026/`.
+- **Why it matters:** the button link and QR images need an absolute, public URL.
+  If you leave this blank, the script falls back to the address the form was
+  submitted from — and a registration done from a **local `file://` page (or
+  `localhost`)** produces a link Gmail won't make clickable and QR images that
+  won't load. Setting `SITE_BASE_URL` makes the email reliable no matter where a
+  given registration was submitted from.
+- After changing it, **re-deploy** the script (Step 3 / Manage deployments ▸ Edit
+  ▸ New version ▸ Deploy).
+
+## 4c. Early-bird form + payment-upload flow (rev2)
+
+The early-bird version of the form is **`omc-registration-june22.html`**. Its flow
+is now three pages:
+
+```
+omc-registration-june22.html ─► omc-payment.html ─► omc-thankyou.html
+   (register)                      (pay + upload)       (fish quiz)
+```
+
+1. **Paste the same `/exec` URL** (from Step 3) into the `APPS_SCRIPT_URL` line of
+   **both** `omc-registration-june22.html` and `omc-payment.html` (and the backup
+   `omc-registration-july20.html` if you use it).
+2. **Set the payment handles** in `omc-payment.html` (the `PAYMENT` object) to
+   match `google-apps-script.gs`, exactly as in Step 4b.
+
+### Drive folder for receipts + student IDs
+
+Uploaded payment receipts (and student IDs for student tickets) are saved to
+**Google Drive** — in the Google account that owns/deploys the Apps Script —
+and logged in a new **"Payments"** tab. They are **never** stored on the web
+server / WordPress; the website only forwards them to the script. This is
+completely independent of where IT hosts the pages.
+
+The destination can be **any folder the script owner can access** — a folder in
+their own Drive, or a **Shared Drive** folder (handy if you want finance to see
+the receipts directly without re-sharing). The script runs *as its owner*, so
+that owner account must own or be shared into whichever folder you choose.
+
+1. In <https://drive.google.com> create a folder, e.g. **OMC 2026 Payments**.
+2. Open it and copy the ID from the URL
+   (`drive.google.com/drive/folders/THIS_PART`).
+3. In `google-apps-script.gs`, paste it into:
+   ```js
+   var PAYMENTS_FOLDER_ID = ''; // ← paste the folder ID here
+   ```
+   (Leave it blank to auto-create a folder named "OMC 2026 Payments" in your
+   Drive root instead.)
+   **This project is already configured** with folder ID
+   `1uQDMwvcMDmUrZU6o31ReOrjz9FE3ndx5` — make sure the script-owner account can
+   open that folder.
+4. **Re-deploy** the script (Manage deployments ▸ Edit ▸ New version ▸ Deploy).
+   The first upload will prompt for the **Google Drive** permission — click
+   **Allow**.
+
+> Because the payment page reads the response (to confirm the upload), the
+> deployment must keep **Who has access: Anyone** (Step 3).
+
 ## 5. Test it locally
 
 You can just double-click `omc-registration.html` to open it in your browser —
@@ -122,12 +191,57 @@ you can issue the $10 merchandise vouchers manually (up to 2 referrals each).
 
 ## 6. Hand off to IT
 
-Give the IT team the **final `omc-registration.html`** (with the real URL pasted
-in) to upload to `https://fica.org/omc/omc-registration.html`. Nothing else on
-the server side is needed — the form talks directly to your Apps Script.
+For the early-bird launch, the **live page is `omc-registration-june22.html`**.
+Give the IT team these files (with the real URL pasted in), keeping the same
+relative paths:
 
-The Apps Script and Sheet stay in **your** Google account; IT never needs access
-to them.
+- `omc-registration-june22.html` (the live registration form)
+- `omc-payment.html` and `omc-thankyou.html` (the payment + thank-you pages)
+- the `payment barcode/` folder (Zelle/Venmo QR images)
+- the `t-shirt/` folder (the `Tshirt Options.jpeg` preview image)
+
+On GitHub Pages the live link is
+`https://benarivoo.github.io/omc-2026-registration/omc-registration-june22.html`.
+Nothing else on the server side is needed — the pages talk directly to your
+Apps Script.
+
+The Apps Script, Sheet, and Drive folder stay in **your** Google account; IT
+never needs access to them.
+
+### Hosting on WordPress (or any cPanel / FTP host)
+
+The pages are plain static files, so the reliable way to put them on a WordPress
+site is to **upload them as static files into their own sub-folder next to
+WordPress** — using cPanel **File Manager** or **FTP** — *not* by pasting the
+HTML into a WordPress Page or Post.
+
+> **Why not a WordPress Page/Post?** WordPress strips/sanitises `<script>` tags
+> (the form logic would stop working) and serves the page at a "pretty" URL with
+> no `.html`, which breaks every relative link between the pages and to the
+> images. Static files in a sub-folder avoid both problems.
+
+**"Same folder" means the same directory on the web server** — *not* a folder
+inside the WordPress dashboard. WordPress itself is just files in a directory
+(usually `public_html/`); you drop your event files into a **sibling sub-folder**
+beside it, keeping the exact structure so the relative links and the email's
+QR-image / "complete your payment" URLs all resolve:
+
+```
+public_html/
+├── (WordPress's own files: wp-content/, wp-admin/, …)
+└── omc2026/                       ← create this sub-folder, upload into it
+    ├── omc-registration-june22.html
+    ├── omc-payment.html
+    ├── omc-thankyou.html
+    ├── payment barcode/           (FICA Zelle.jpeg, FICA Venmo.jpeg)
+    └── t-shirt/                   (Tshirt Options.jpeg)
+```
+
+The registration link to share then becomes:
+`https://yourdomain.com/omc2026/omc-registration-june22.html`
+
+No WordPress plugin or server-side code is needed — exactly as with GitHub Pages,
+the pages talk directly to your Apps Script.
 
 ---
 

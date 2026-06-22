@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OMC 2026 — Thank you</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy: #1a2640;
+      --navy-light: #2b3d5c;
+      --gold: #c9a84c;
+      --gold-light: #e8c97a;
+      --cream: #faf8f4;
+      --white: #ffffff;
+      --muted: #6b7280;
+      --border: #e5e0d8;
+      --radius: 8px;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--cream);
+      color: var(--navy);
+      min-height: 100vh;
+    }
+
+    .site-header {
+      background: var(--navy);
+      padding: 1.25rem 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .site-header .org-name {
+      font-size: 13px;
+      font-weight: 400;
+      color: rgba(255,255,255,0.7);
+      letter-spacing: 0.06em;
+    }
+
+    .hero {
+      background: var(--navy);
+      padding: 3.5rem 2rem 3rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 0%, rgba(201,168,76,0.12) 0%, transparent 65%);
+      pointer-events: none;
+    }
+    .hero-eyebrow {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.75rem;
+    }
+    .hero h1 {
+      font-family: 'Lora', serif;
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 500;
+      color: var(--white);
+      line-height: 1.15;
+    }
+    .hero-divider { width: 36px; height: 1px; background: var(--gold); margin: 1.5rem auto 0; opacity: 0.6; }
+
+    .page-wrap { max-width: 600px; margin: 0 auto; padding: 3rem 1.5rem 4rem; text-align: center; }
+
+    .success-icon {
+      width: 56px; height: 56px;
+      border: 1.5px solid var(--navy);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 1.5rem;
+      font-size: 24px;
+    }
+    .page-wrap h2 {
+      font-family: 'Lora', serif;
+      font-size: 24px;
+      font-weight: 500;
+      color: var(--navy);
+      margin-bottom: 0.75rem;
+    }
+    .page-wrap > p { font-size: 14px; color: var(--muted); line-height: 1.7; max-width: 440px; margin: 0 auto; }
+
+    /* FICA quiz call-to-action */
+    .quiz-box {
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: 12px; padding: 1.75rem; max-width: 440px;
+      margin: 2rem auto 0;
+    }
+    .quiz-box h3 {
+      font-family: 'Lora', serif; font-size: 18px; font-weight: 500;
+      color: var(--navy); margin-bottom: 0.5rem;
+    }
+    .quiz-box p { font-size: 13px; color: var(--muted); margin-bottom: 0; line-height: 1.6; }
+    .quiz-cta {
+      display: inline-block; margin-top: 1rem;
+      background: var(--gold); color: var(--navy);
+      text-decoration: none; font-weight: 600; font-size: 14px;
+      padding: 11px 24px; border-radius: 999px;
+      transition: background 0.15s;
+    }
+    .quiz-cta:hover { background: var(--gold-light); }
+
+    .footer {
+      text-align: center; padding: 2rem; font-size: 12px;
+      color: var(--muted); border-top: 1px solid var(--border);
+    }
+    .footer a { color: inherit; }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="org-name">Fellowship of Indonesian Christians in America</div>
+  </header>
+
+  <div class="hero">
+    <p class="hero-eyebrow">Overseas Mission Conference · 2026</p>
+    <h1>Thank you!</h1>
+    <div class="hero-divider"></div>
+  </div>
+
+  <div class="page-wrap">
+    <div class="success-icon">✓</div>
+    <h2>Your payment proof is in</h2>
+    <p>Thanks for registering for OMC 2026. We've received your payment proof and will verify it shortly — a confirmation will be emailed to you. We can't wait to see you there!</p>
+
+    <!-- FICA quiz -->
+    <div class="quiz-box">
+      <h3>Before you go — what fish are you?</h3>
+      <p>Take FICA's quick "What Fish Are You?" quiz — a fun way to start your OMC 2026 journey. It only takes a minute.</p>
+      <a class="quiz-cta" href="https://omc2026fishquiz.netlify.app" target="_blank" rel="noopener">Take the quiz</a>
+    </div>
+  </div>
+
+  <footer class="footer">
+    © 2026 Fellowship of Indonesian Christians in America · <a href="https://fica.org">fica.org</a>
+  </footer>
+
+</body>
+</html>
