@@ -304,10 +304,10 @@ function sendPaymentAckEmail_(data) {
     lines.push('Your registration reference: ' + data.regId);
   }
   lines.push('');
-  lines.push('Haven\'t taken our "What Fish Are You?" quiz yet? Discover your fish here:');
+  lines.push('One more thing — take FICA\'s "What Fish Are You?" personality quiz. It helps us set up groups for activities during the conference, and only takes a minute:');
   lines.push('  ' + QUIZ_URL);
   lines.push('');
-  lines.push('See you there,');
+  lines.push('Warmly,');
   lines.push('The ' + EVENT_NAME + ' team');
 
   MailApp.sendEmail({
@@ -338,8 +338,8 @@ function buildPaymentAckHtml_(firstName, amount, regId) {
   if (regId) {
     h.push('<p style="background:#faf8f4;border:1px dashed #e5e0d8;border-radius:8px;padding:10px 12px;">Your registration reference:<br><strong>' + esc(regId) + '</strong></p>');
   }
-  h.push('<p style="background:#faf8f4;border:1px solid #e5e0d8;border-radius:8px;padding:12px 14px;font-size:13px;">Haven\'t taken our <strong>"What Fish Are You?"</strong> quiz yet? <a href="' + esc(QUIZ_URL) + '" style="color:#1a2640;font-weight:bold;">Discover your fish &rarr;</a></p>');
-  h.push('<p style="margin-top:18px;">See you there,<br>The ' + esc(EVENT_NAME) + ' team</p>');
+  h.push('<p style="background:#faf8f4;border:1px solid #e5e0d8;border-radius:8px;padding:12px 14px;font-size:13px;">One more thing — take FICA\'s <strong>"What Fish Are You?"</strong> personality quiz. It helps us set up groups for activities during the conference. <a href="' + esc(QUIZ_URL) + '" style="color:#1a2640;font-weight:bold;">Take the quiz &rarr;</a></p>');
+  h.push('<p style="margin-top:18px;">Warmly,<br>The ' + esc(EVENT_NAME) + ' team</p>');
   h.push('</div>');
   return h.join('');
 }
@@ -502,10 +502,6 @@ function sendConfirmationEmail_(data) {
       lines.push('Remember to share your group link so each member can register their own details.');
     }
   }
-
-  lines.push('');
-  lines.push('Haven\'t taken our "What Fish Are You?" quiz yet? Discover your fish here:');
-  lines.push('  ' + QUIZ_URL);
 
   lines.push('');
   lines.push('See you there,');
@@ -687,7 +683,6 @@ function buildHtmlEmail_(type, data, name, ref, haveQr, isPayer) {
     h.push('<p style="font-size:13px;">Your group name is <strong>' + esc(data.groupCode || '') + '</strong>. Share this link so each member can register their own details (they will not be asked to pay for registration):<br><a href="' + link + '">' + link + '</a></p>');
   }
 
-  h.push('<p style="background:#faf8f4;border:1px solid #e5e0d8;border-radius:8px;padding:12px 14px;font-size:13px;">Haven\'t taken our <strong>"What Fish Are You?"</strong> quiz yet? <a href="' + esc(QUIZ_URL) + '" style="color:#1a2640;font-weight:bold;">Discover your fish &rarr;</a></p>');
   h.push('<p style="margin-top:18px;">See you there,<br>The ' + esc(EVENT_NAME) + ' team</p>');
   h.push('</div>');
   return h.join('');
