@@ -59,7 +59,6 @@ var COLUMNS = [
   { key: 'city',                 header: 'City' },
   { key: 'state',                header: 'State' },
   { key: 'church',               header: 'Church / organisation' },
-  { key: 'role',                 header: 'Role / vocation' },
   { key: 'regTicketType',        header: 'Ticket Type' },
   { key: 'ticket',               header: 'Ticket detail' },
   { key: 'groupName',            header: 'Group name' },
