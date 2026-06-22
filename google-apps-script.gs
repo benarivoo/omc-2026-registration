@@ -79,7 +79,20 @@ var COLUMNS = [
   { key: 'referredByEmail',      header: 'Referred by (email)' },
   { key: 'notes',                header: 'Notes' },
   { key: 'marketingOptIn',       header: 'Marketing opt-in' },
-  { key: 'school',               header: 'School / company' }
+  { key: 'school',               header: 'School / company' },
+  { key: 'gender',               header: 'Gender' },
+  { key: 'address',              header: 'Address' },
+  { key: 'major',                header: 'Major (student)' },
+  { key: 'university',           header: 'University (student)' },
+  { key: 'studentProgram',       header: 'Program / year (student)' },
+  { key: 'jobTitle',             header: 'Job title (professional)' },
+  { key: 'company',              header: 'Company / organization (professional)' },
+  { key: 'industry',             header: 'Industry (professional)' },
+  { key: 'accommodationNights',  header: 'Accommodation nights' },
+  { key: 'attendDays',           header: 'Days attending' },
+  { key: 'language',             header: 'Language(s)' },
+  { key: 'travelMode',           header: 'Travel mode' },
+  { key: 'travelItinerary',      header: 'Travel itinerary' }
 ];
 
 // "Ticket Orders" sheet — one row per ticket type within a registration, plus a

@@ -120,6 +120,13 @@
       margin-bottom: 1.25rem;
     }
 
+    .required-note {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 1rem;
+    }
+    .req-star, .field label .req { color: #c0392b; }
+
     /* Fields */
     .field { margin-bottom: 1.1rem; }
     .field:last-child { margin-bottom: 0; }
@@ -131,6 +138,12 @@
       letter-spacing: 0.05em;
       text-transform: uppercase;
       margin-bottom: 5px;
+    }
+    .field-hint {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 4px;
+      line-height: 1.5;
     }
     .field input,
     .field select,
@@ -162,7 +175,8 @@
       padding-right: 36px;
       cursor: pointer;
     }
-    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 1.1rem; }
+    .row .field { margin-bottom: 0; }
     @media (max-width: 480px) { .row { grid-template-columns: 1fr; } }
 
     /* Ticket options */
@@ -266,6 +280,9 @@
       margin-bottom: 8px;
     }
     .ticket-section-label + .ticket-grid { margin-bottom: 1.1rem; }
+    /* Space the conditional Student/Professional blocks from the next section
+       (their last .field has margin-bottom:0 via the :last-child rule). */
+    #student-fields, #professional-fields { margin: 0.25rem 0 1.5rem; }
     .selected-price-box {
       background: var(--navy);
       color: var(--white);
@@ -291,9 +308,24 @@
       gap: 10px;
       margin-bottom: 0.75rem;
     }
+    /* When a checkbox row is a <label> inside a .field, stop the .field label
+       rule from forcing it block + uppercase (which misaligned the rows). */
+    .field label.check-row {
+      display: flex;
+      text-transform: none;
+      font-weight: 400;
+      letter-spacing: normal;
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 0.6rem;
+      cursor: pointer;
+    }
     .check-row:last-child { margin-bottom: 0; }
     .check-row input[type=checkbox] {
+      appearance: auto;
+      -webkit-appearance: auto;
       width: 16px; height: 16px;
+      padding: 0;
       margin-top: 2px;
       flex-shrink: 0;
       accent-color: var(--navy);
@@ -654,6 +686,8 @@
 
     <div id="status-msg" class="status-msg"></div>
 
+    <p class="required-note">Fields marked <span class="req-star">*</span> are required</p>
+
     <div id="form-view">
 
       <!-- Honeypot: hidden from humans, a spam trap. Leave blank. -->
@@ -691,34 +725,40 @@
             <input type="tel" name="phone" placeholder="+1 000 000 0000" />
             <p class="field-error">Please enter your phone number.</p>
           </div>
+          <div class="field" id="f-gender">
+            <label>Gender *</label>
+            <select name="gender">
+              <option value="" disabled selected>Select one</option>
+              <option>Male</option>
+              <option>Female</option>
+            </select>
+            <p class="field-error">Please select your gender.</p>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Address</label>
+          <input type="text" name="address" placeholder="Street address" />
+        </div>
+
+        <div class="row">
           <div class="field" id="f-city">
             <label>City *</label>
             <input type="text" name="city" placeholder="e.g. Boston" />
             <p class="field-error">Please enter your city.</p>
           </div>
-        </div>
-
-        <div class="row">
           <div class="field" id="f-state">
             <label>State *</label>
-            <input type="text" name="state" placeholder="e.g. MA" />
+            <input type="text" name="state" placeholder="e.g. CA 94122" />
+            <p class="field-hint">Write your state followed by your zip code. Example: CA 94122</p>
             <p class="field-error">Please enter your state.</p>
-          </div>
-          <div class="field">
-            <label>School / company</label>
-            <input type="text" name="school" placeholder="Your school or company" />
           </div>
         </div>
 
-        <div class="row">
-          <div class="field">
-            <label>Church / organisation</label>
-            <input type="text" name="church" placeholder="Church or organisation" />
-          </div>
-          <div class="field">
-            <label>Role / vocation</label>
-            <input type="text" name="role" placeholder="e.g. Student, Pastor" />
-          </div>
+        <div class="field" id="f-church">
+          <label>Local fellowship or church regularly attended *</label>
+          <input type="text" name="church" placeholder="e.g. Grace Indonesian Fellowship — Boston, MA" />
+          <p class="field-error">Please tell us the local fellowship or church you regularly attend.</p>
         </div>
       </div>
 
@@ -745,6 +785,53 @@
               <input type="radio" name="category" value="professional" />
               <div class="t-name">Professional</div>
               <div class="t-price">For working professionals</div>
+            </div>
+          </div>
+
+          <!-- Student-only details (shown when "Student" is selected) -->
+          <div id="student-fields">
+            <div class="field" id="f-major">
+              <label>Major *</label>
+              <input type="text" name="major" placeholder="e.g. Computer Science" />
+              <p class="field-error">Please enter your major.</p>
+            </div>
+            <div class="field" id="f-university">
+              <label>University (Name, City, State) *</label>
+              <input type="text" name="university" placeholder="e.g. UC Berkeley, Berkeley, CA" />
+              <p class="field-error">Please enter your university name and location.</p>
+            </div>
+            <div class="field" id="f-program">
+              <label>What program / year are you in? *</label>
+              <select name="studentProgram">
+                <option value="" disabled selected>Select one</option>
+                <option>Freshman</option>
+                <option>Sophomore</option>
+                <option>Junior</option>
+                <option>Senior</option>
+                <option>Master program</option>
+                <option>PhD program</option>
+                <option>Other</option>
+              </select>
+              <p class="field-error">Please select your program / year.</p>
+            </div>
+          </div>
+
+          <!-- Professional-only details (shown when "Professional" is selected) -->
+          <div id="professional-fields" hidden>
+            <div class="field" id="f-jobtitle">
+              <label>Job Title *</label>
+              <input type="text" name="jobTitle" placeholder="e.g. Software Engineer" />
+              <p class="field-error">Please enter your job title.</p>
+            </div>
+            <div class="field" id="f-company">
+              <label>Company / Organization *</label>
+              <input type="text" name="company" placeholder="e.g. Acme Corp" />
+              <p class="field-error">Please enter your company or organization.</p>
+            </div>
+            <div class="field" id="f-industry">
+              <label>Industry *</label>
+              <input type="text" name="industry" placeholder="e.g. Technology, Healthcare, Education" />
+              <p class="field-error">Please enter your industry.</p>
             </div>
           </div>
 
@@ -781,6 +868,14 @@
           <span class="sp-label" id="selected-price-label">Your selected ticket</span>
           <span class="sp-amount" id="selected-price-amount">$190</span>
         </div>
+
+        <!-- Accommodation nights (shown when the Full Package / accommodation is selected) -->
+        <div class="field" id="accommodation-nights" style="margin-top:1.25rem;">
+          <label>Which nights do you need accommodation? (select all that apply)</label>
+          <label class="check-row"><input type="checkbox" name="accomNight" value="Friday Night (September 4)" /><span>Friday Night (September 4)</span></label>
+          <label class="check-row"><input type="checkbox" name="accomNight" value="Saturday Night (September 5)" /><span>Saturday Night (September 5)</span></label>
+          <label class="check-row"><input type="checkbox" name="accomNight" value="Sunday Night (September 6)" /><span>Sunday Night (September 6)</span></label>
+        </div>
       </div>
 
       <!-- Additional -->
@@ -791,6 +886,42 @@
           <label>Dietary requirements *</label>
           <input type="text" name="dietary" placeholder="e.g. vegetarian, gluten-free, none" />
           <p class="field-error">Please let us know your dietary requirements (write "none" if none).</p>
+        </div>
+
+        <div class="field">
+          <label>What days will you attend? (select all that apply)</label>
+          <label class="check-row"><input type="checkbox" id="attend-all" /><span><strong>All days</strong></span></label>
+          <label class="check-row"><input type="checkbox" name="attendDay" value="September 4" /><span>September 4</span></label>
+          <label class="check-row"><input type="checkbox" name="attendDay" value="September 5" /><span>September 5</span></label>
+          <label class="check-row"><input type="checkbox" name="attendDay" value="September 6" /><span>September 6</span></label>
+          <label class="check-row"><input type="checkbox" name="attendDay" value="September 7" /><span>September 7</span></label>
+        </div>
+
+        <div class="field">
+          <label>Language (select all that apply)</label>
+          <label class="check-row"><input type="checkbox" name="language" value="Indonesian" /><span>Indonesian</span></label>
+          <label class="check-row"><input type="checkbox" name="language" value="English" /><span>English</span></label>
+          <label class="check-row"><input type="checkbox" id="language-other-toggle" name="language" value="Other" /><span>Other</span></label>
+          <input type="text" id="language-other" name="languageOther" placeholder="Please specify your language" style="margin-top:8px;" hidden />
+        </div>
+
+        <div class="field" id="f-travel">
+          <label>How will you get to the conference? *</label>
+          <select name="travelMode">
+            <option value="" disabled selected>Select one</option>
+            <option>Car</option>
+            <option>Airplane</option>
+            <option>Train</option>
+            <option>Bus</option>
+            <option>Undecided</option>
+          </select>
+          <p class="field-error">Please tell us how you'll get to the conference.</p>
+        </div>
+
+        <div class="field">
+          <label>Travel itinerary</label>
+          <p class="field-hint">Please provide arrival and departure time, flight number, and airport/station (if available).</p>
+          <textarea name="travelItinerary" placeholder="e.g. Arrive Sep 4, 3:00pm — UA123 into SFO; depart Sep 7, 6:00pm"></textarea>
         </div>
 
         <div class="field">
@@ -808,7 +939,7 @@
         </div>
 
         <div class="field" style="margin-top:1.1rem;">
-          <label>Anything else you'd like us to know? (optional)</label>
+          <label>Anything else you'd like us to know?</label>
           <textarea name="notes" placeholder="Accessibility needs, questions, etc."></textarea>
         </div>
       </div>
@@ -884,6 +1015,7 @@
 
       <div class="submit-area">
         <button class="submit-btn" id="submit-btn" onclick="submitForm()">Continue to payment</button>
+        <p class="required-note" style="text-align:center; margin-top:0.75rem; margin-bottom:0;">Fields marked <span class="req-star">*</span> are required</p>
         <p class="submit-note">Your information is stored securely and will only be used for OMC 2026 planning.</p>
       </div>
 
@@ -959,6 +1091,22 @@
     function updatePricingUI() {
       updateTicketUI();
       updateOrderSummary();
+      updateCategoryFields();
+    }
+
+    // Show the Student detail fields when "Student" is selected, the
+    // Professional detail fields when "Professional" is selected, and the
+    // accommodation-night picker when the Full Package (with accommodation) is
+    // selected.
+    function updateCategoryFields() {
+      const isStudent = getSelectedCategory() === 'student';
+      const studentEl = document.getElementById('student-fields');
+      const proEl = document.getElementById('professional-fields');
+      if (studentEl) studentEl.hidden = !isStudent;
+      if (proEl) proEl.hidden = isStudent;
+
+      const accomEl = document.getElementById('accommodation-nights');
+      if (accomEl) accomEl.hidden = (getSelectedPackage() !== 'full');
     }
 
     // Refresh the price shown on a package card: early price as the primary
@@ -1134,11 +1282,48 @@
       updateOrderSummary();
     });
 
+    // "All days" checkbox toggles every attendance-day checkbox; if any day is
+    // unchecked manually, "All days" un-checks itself.
+    const attendAll = document.getElementById('attend-all');
+    const attendDays = Array.from(document.querySelectorAll('input[name="attendDay"]'));
+    if (attendAll) {
+      attendAll.addEventListener('change', () => {
+        attendDays.forEach(d => { d.checked = attendAll.checked; });
+      });
+      attendDays.forEach(d => d.addEventListener('change', () => {
+        attendAll.checked = attendDays.every(x => x.checked);
+      }));
+    }
+
+    // Reveal the "Other language" text box only when "Other" is ticked.
+    const langOtherToggle = document.getElementById('language-other-toggle');
+    const langOtherInput = document.getElementById('language-other');
+    if (langOtherToggle && langOtherInput) {
+      langOtherToggle.addEventListener('change', () => {
+        langOtherInput.hidden = !langOtherToggle.checked;
+        if (!langOtherToggle.checked) langOtherInput.value = '';
+      });
+    }
+
     updatePricingUI();
 
     function getVal(name) {
       const el = document.querySelector(`[name="${name}"]`);
       return el ? el.value.trim() : '';
+    }
+
+    // Comma-joined values of all checked checkboxes sharing a name (multi-select).
+    function getChecked(name) {
+      return Array.from(document.querySelectorAll(`input[name="${name}"]:checked`))
+        .map(el => el.value).join(', ');
+    }
+
+    // Selected languages, with the free-text value substituted in for "Other".
+    function getLanguages() {
+      const other = getVal('languageOther');
+      return Array.from(document.querySelectorAll('input[name="language"]:checked'))
+        .map(el => (el.value === 'Other' && other) ? ('Other: ' + other) : el.value)
+        .join(', ');
     }
 
     function setError(fieldId, show) {
@@ -1163,11 +1348,22 @@
         lastName: getVal('lastName'),
         email: getVal('email'),
         phone: getVal('phone'),
+        gender: getVal('gender'),
         city: getVal('city'),
         state: getVal('state'),
-        school: getVal('school'),
+        address: getVal('address'),
         church: getVal('church'),
-        role: getVal('role'),
+        major: getVal('major'),
+        university: getVal('university'),
+        studentProgram: getVal('studentProgram'),
+        jobTitle: getVal('jobTitle'),
+        company: getVal('company'),
+        industry: getVal('industry'),
+        accommodationNights: getChecked('accomNight'),
+        attendDays: getChecked('attendDay'),
+        language: getLanguages(),
+        travelMode: getVal('travelMode'),
+        travelItinerary: getVal('travelItinerary'),
         dietary: getVal('dietary'),
         referral: getVal('referral'),
         notes: getVal('notes'),
@@ -1205,7 +1401,8 @@
 
     async function submitForm() {
       // Clear previous errors
-      ['f-firstname','f-lastname','f-email','f-phone','f-city','f-state','f-dietary'].forEach(id => setError(id, false));
+      ['f-firstname','f-lastname','f-email','f-phone','f-gender','f-city','f-state','f-church','f-dietary','f-travel',
+       'f-major','f-university','f-program','f-jobtitle','f-company','f-industry'].forEach(id => setError(id, false));
       document.getElementById('status-msg').className = 'status-msg';
 
       // Validate required fields
@@ -1215,9 +1412,23 @@
       const email = getVal('email');
       if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setError('f-email', true); valid = false; }
       if (!getVal('phone'))   { setError('f-phone', true);   valid = false; }
+      if (!getVal('gender'))  { setError('f-gender', true);  valid = false; }
       if (!getVal('city'))    { setError('f-city', true);    valid = false; }
       if (!getVal('state'))   { setError('f-state', true);   valid = false; }
+      if (!getVal('church'))  { setError('f-church', true);  valid = false; }
       if (!getVal('dietary')) { setError('f-dietary', true); valid = false; }
+      if (!getVal('travelMode')) { setError('f-travel', true); valid = false; }
+
+      // Category-specific required fields.
+      if (getSelectedCategory() === 'student') {
+        if (!getVal('major'))          { setError('f-major', true);      valid = false; }
+        if (!getVal('university'))     { setError('f-university', true); valid = false; }
+        if (!getVal('studentProgram')) { setError('f-program', true);    valid = false; }
+      } else {
+        if (!getVal('jobTitle')) { setError('f-jobtitle', true); valid = false; }
+        if (!getVal('company'))  { setError('f-company', true);  valid = false; }
+        if (!getVal('industry')) { setError('f-industry', true); valid = false; }
+      }
       if (!document.getElementById('terms').checked) {
         showStatus('Please accept the terms & conditions to continue.', 'error');
         valid = false;
