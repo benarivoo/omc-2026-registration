@@ -304,7 +304,7 @@ function sendPaymentAckEmail_(data) {
     lines.push('Your registration reference: ' + data.regId);
   }
   lines.push('');
-  lines.push('One more thing — take FICA\'s "What Fish Are You?" personality quiz. It helps us set up groups for activities during the conference, and only takes a minute:');
+  lines.push('Take FICA\'s "What Fish Are You?" quiz — this personality test will help us set up groups for activities during the conference. It\'s a fun quiz and only takes a minute to complete!');
   lines.push('  ' + QUIZ_URL);
   lines.push('');
   lines.push('Warmly,');
@@ -338,7 +338,7 @@ function buildPaymentAckHtml_(firstName, amount, regId) {
   if (regId) {
     h.push('<p style="background:#faf8f4;border:1px dashed #e5e0d8;border-radius:8px;padding:10px 12px;">Your registration reference:<br><strong>' + esc(regId) + '</strong></p>');
   }
-  h.push('<p style="background:#faf8f4;border:1px solid #e5e0d8;border-radius:8px;padding:12px 14px;font-size:13px;">One more thing — take FICA\'s <strong>"What Fish Are You?"</strong> personality quiz. It helps us set up groups for activities during the conference. <a href="' + esc(QUIZ_URL) + '" style="color:#1a2640;font-weight:bold;">Take the quiz &rarr;</a></p>');
+  h.push('<p style="background:#faf8f4;border:1px solid #e5e0d8;border-radius:8px;padding:12px 14px;font-size:13px;">Take FICA\'s <strong>"What Fish Are You?"</strong> quiz — this personality test will help us set up groups for activities during the conference. It\'s a fun quiz and only takes a minute to complete! <a href="' + esc(QUIZ_URL) + '" style="color:#1a2640;font-weight:bold;">Take the quiz &rarr;</a></p>');
   h.push('<p style="margin-top:18px;">Warmly,<br>The ' + esc(EVENT_NAME) + ' team</p>');
   h.push('</div>');
   return h.join('');
