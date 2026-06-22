@@ -114,16 +114,16 @@ var SITE_BASE_URL = 'https://benarivoo.github.io/omc-2026-registration/'; // mus
 
 ## 4c. Early-bird form + payment-upload flow (rev2)
 
-The early-bird version of the form is **`omc-registration-june22.html`**. Its flow
+The early-bird version of the form is **`omc-registration.html`**. Its flow
 is now three pages:
 
 ```
-omc-registration-june22.html ─► omc-payment.html ─► omc-thankyou.html
+omc-registration.html ─► omc-payment.html ─► omc-thankyou.html
    (register)                      (pay + upload)       (fish quiz)
 ```
 
 1. **Paste the same `/exec` URL** (from Step 3) into the `APPS_SCRIPT_URL` line of
-   **both** `omc-registration-june22.html` and `omc-payment.html` (and the backup
+   **both** `omc-registration.html` and `omc-payment.html` (and the backup
    `omc-registration-july20.html` if you use it).
 2. **Set the payment handles** in `omc-payment.html` (the `PAYMENT` object) to
    match `google-apps-script.gs`, exactly as in Step 4b.
@@ -191,17 +191,17 @@ you can issue the $10 merchandise vouchers manually (up to 2 referrals each).
 
 ## 6. Hand off to IT
 
-For the early-bird launch, the **live page is `omc-registration-june22.html`**.
+For the early-bird launch, the **live page is `omc-registration.html`**.
 Give the IT team these files (with the real URL pasted in), keeping the same
 relative paths:
 
-- `omc-registration-june22.html` (the live registration form)
+- `omc-registration.html` (the live registration form)
 - `omc-payment.html` and `omc-thankyou.html` (the payment + thank-you pages)
 - the `payment barcode/` folder (Zelle/Venmo QR images)
 - the `t-shirt/` folder (the `Tshirt Options.jpeg` preview image)
 
 On GitHub Pages the live link is
-`https://benarivoo.github.io/omc-2026-registration/omc-registration-june22.html`.
+`https://benarivoo.github.io/omc-2026-registration/omc-registration.html`.
 Nothing else on the server side is needed — the pages talk directly to your
 Apps Script.
 
@@ -230,7 +230,7 @@ QR-image / "complete your payment" URLs all resolve:
 public_html/
 ├── (WordPress's own files: wp-content/, wp-admin/, …)
 └── omc2026/                       ← create this sub-folder, upload into it
-    ├── omc-registration-june22.html
+    ├── omc-registration.html
     ├── omc-payment.html
     ├── omc-thankyou.html
     ├── payment barcode/           (FICA Zelle.jpeg, FICA Venmo.jpeg)
@@ -238,7 +238,7 @@ public_html/
 ```
 
 The registration link to share then becomes:
-`https://yourdomain.com/omc2026/omc-registration-june22.html`
+`https://yourdomain.com/omc2026/omc-registration.html`
 
 No WordPress plugin or server-side code is needed — exactly as with GitHub Pages,
 the pages talk directly to your Apps Script.

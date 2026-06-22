@@ -5,8 +5,13 @@ both the team and non-technical stakeholders.
 
 ## Unreleased — 2026-06-21 (CC finance on both emails)
 
+- **Consolidated to a single registration form.** The early-bird form
+  (previously `omc-registration-june22.html`) is now simply
+  **`omc-registration.html`**, and the old group/referral version that used that
+  name was removed (it's still preserved as the `omc-registration-july20.html`
+  backup). So the live registration page is now `omc-registration.html`.
 - The **payment-instructions email** (sent when someone registers on
-  `omc-registration-june22.html`) and the **payment-proof acknowledgement email**
+  `omc-registration.html`) and the **payment-proof acknowledgement email**
   (sent after they upload their receipt on `omc-payment.html`) are now **CC'd to
   `fica.treasury@gmail.com` and `yennychandra@fica.org`**. This gives finance a
   copy of what each registrant was told — the amount due, Zelle/Venmo details and

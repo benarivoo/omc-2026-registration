@@ -500,6 +500,23 @@
       text-transform: uppercase; letter-spacing: 0.06em;
     }
 
+    /* Package cards (Full Package / Conference Entry Ticket) */
+    .pkg-grid { grid-template-columns: 1fr; }
+    .pkg-bullets {
+      list-style: none; margin: 8px 0 10px; padding: 0;
+      font-size: 12px; color: var(--muted); line-height: 1.6;
+    }
+    .pkg-bullets li { position: relative; padding-left: 16px; }
+    .pkg-bullets li::before {
+      content: ''; position: absolute; left: 2px; top: 8px;
+      width: 5px; height: 5px; border-radius: 50%; background: var(--gold);
+    }
+    .pkg-price { display: flex; align-items: baseline; gap: 8px; }
+    .pkg-price .pkg-now {
+      font-family: 'Lora', serif; font-size: 20px; font-weight: 500; color: var(--navy);
+    }
+    .pkg-price .pkg-was { font-size: 13px; color: var(--muted); }
+
     /* T-shirt order */
     .tshirt-options-img {
       width: 100%; max-width: 360px; display: block; margin: 0.25rem auto 1.1rem;
@@ -645,26 +662,6 @@
         <input type="text" id="hp-website" name="website" tabindex="-1" autocomplete="off" />
       </div>
 
-      <!-- Group member banner (shown when arriving via a group link) -->
-      <div class="member-banner" id="member-banner" hidden></div>
-
-      <!-- Registration path -->
-      <div class="card" id="path-card">
-        <p class="card-title">How are you registering?</p>
-        <div class="ticket-grid path-grid" id="path-group">
-          <div class="ticket selected" data-path="individual">
-            <input type="radio" name="path" value="individual" checked />
-            <div class="t-name">Just me</div>
-            <div class="t-price">Individual registration</div>
-          </div>
-          <div class="ticket" data-path="group">
-            <input type="radio" name="path" value="group" />
-            <div class="t-name">A group (5+)</div>
-            <div class="t-price">$10 off each person</div>
-          </div>
-        </div>
-      </div>
-
       <!-- Personal info -->
       <div class="card">
         <p class="card-title">Personal details</p>
@@ -689,13 +686,27 @@
         </div>
 
         <div class="row">
-          <div class="field">
-            <label>Phone (optional)</label>
+          <div class="field" id="f-phone">
+            <label>Phone (WhatsApp) *</label>
             <input type="tel" name="phone" placeholder="+1 000 000 0000" />
+            <p class="field-error">Please enter your phone number.</p>
+          </div>
+          <div class="field" id="f-city">
+            <label>City *</label>
+            <input type="text" name="city" placeholder="e.g. Boston" />
+            <p class="field-error">Please enter your city.</p>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="field" id="f-state">
+            <label>State *</label>
+            <input type="text" name="state" placeholder="e.g. MA" />
+            <p class="field-error">Please enter your state.</p>
           </div>
           <div class="field">
-            <label>City / state</label>
-            <input type="text" name="city" placeholder="e.g. Boston, MA" />
+            <label>School / company</label>
+            <input type="text" name="school" placeholder="Your school or company" />
           </div>
         </div>
 
@@ -716,43 +727,14 @@
         <p class="card-title">Registration &amp; pricing</p>
 
         <ul class="pricing-schedule">
-          <li><strong>Early bird:</strong> June 22 – July 12</li>
-          <li><strong>Regular:</strong> July 12 – August 20</li>
+          <li><strong>Price increases July 12</strong> · Registration ends August 20</li>
         </ul>
-
-        <div class="pricing-info">
-          <h3>Ticket prices (USD)</h3>
-          <table class="pricing-table">
-            <thead>
-              <tr>
-                <th>Category</th>
-                <th>Early bird</th>
-                <th>Early bird w/o accommodation &amp; food</th>
-                <th>Regular</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Student</td>
-                <td>$190</td>
-                <td>$140</td>
-                <td>$220</td>
-              </tr>
-              <tr>
-                <td>Professional</td>
-                <td>$260</td>
-                <td>$190</td>
-                <td>$290</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
 
         <div id="period-badge" class="pricing-period-badge" hidden></div>
 
-        <!-- Individual ticket selection -->
+        <!-- Ticket selection -->
         <div id="individual-ticket">
-          <p class="ticket-section-label">Category *</p>
+          <p class="ticket-section-label">Who are you registering as? *</p>
           <div class="ticket-grid" id="category-group">
             <div class="ticket selected" data-category="student">
               <input type="radio" name="category" value="student" checked />
@@ -766,78 +748,32 @@
             </div>
           </div>
 
-          <p class="ticket-section-label">Package *</p>
-          <div class="ticket-grid" id="package-group">
+          <p class="ticket-section-label">Choose your ticket *</p>
+          <div class="ticket-grid pkg-grid" id="package-group">
             <div class="ticket selected" data-package="full">
               <input type="radio" name="package" value="full" checked />
-              <div class="t-name">Full registration</div>
-              <div class="t-price">Includes accommodation &amp; food</div>
-            </div>
-            <div class="ticket" data-package="no-acc">
-              <input type="radio" name="package" value="no-acc" />
-              <div class="t-name">Without accommodation &amp; food</div>
-              <div class="t-price" id="no-acc-price-hint">$140 · Student</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Group lead selection -->
-        <div id="group-ticket" hidden>
-          <p class="group-hint" style="margin-top:0;">Your group will be given an automatic name (group-1, group-2, ...) and a shareable link once you register.</p>
-
-          <p class="ticket-section-label">How many people? (5+ total)</p>
-          <div class="qty-list">
-            <div class="qty-row">
-              <div>
-                <div class="qty-label">Student — full <span class="qty-price" id="price-qtyStudentFull"></span></div>
-                <div class="qty-sub">Accommodation &amp; food</div>
-              </div>
-              <div class="qty-stepper">
-                <button type="button" data-step="-1" data-qty="qtyStudentFull">−</button>
-                <input type="number" id="qtyStudentFull" name="qtyStudentFull" value="0" min="0" inputmode="numeric" />
-                <button type="button" data-step="1" data-qty="qtyStudentFull">+</button>
+              <div class="t-name">Full Package</div>
+              <ul class="pkg-bullets">
+                <li>Conference</li>
+                <li>Accommodation</li>
+                <li>Meals</li>
+              </ul>
+              <div class="pkg-price">
+                <span class="pkg-now" id="price-full-now">$190</span>
+                <s class="pkg-was" id="price-full-was">$220</s>
               </div>
             </div>
-            <div class="qty-row">
-              <div>
-                <div class="qty-label">Student — no accommodation <span class="qty-price" id="price-qtyStudentNoAcc"></span></div>
-                <div class="qty-sub">Without accommodation &amp; food</div>
-              </div>
-              <div class="qty-stepper">
-                <button type="button" data-step="-1" data-qty="qtyStudentNoAcc">−</button>
-                <input type="number" id="qtyStudentNoAcc" name="qtyStudentNoAcc" value="0" min="0" inputmode="numeric" />
-                <button type="button" data-step="1" data-qty="qtyStudentNoAcc">+</button>
-              </div>
-            </div>
-            <div class="qty-row">
-              <div>
-                <div class="qty-label">Professional — full <span class="qty-price" id="price-qtyProFull"></span></div>
-                <div class="qty-sub">Accommodation &amp; food</div>
-              </div>
-              <div class="qty-stepper">
-                <button type="button" data-step="-1" data-qty="qtyProFull">−</button>
-                <input type="number" id="qtyProFull" name="qtyProFull" value="0" min="0" inputmode="numeric" />
-                <button type="button" data-step="1" data-qty="qtyProFull">+</button>
+            <div class="ticket" data-package="entry">
+              <input type="radio" name="package" value="entry" />
+              <div class="t-name">Conference Entry Ticket</div>
+              <ul class="pkg-bullets">
+                <li>Conference</li>
+              </ul>
+              <div class="pkg-price">
+                <span class="pkg-now" id="price-entry-now">$140</span>
+                <s class="pkg-was" id="price-entry-was">$170</s>
               </div>
             </div>
-            <div class="qty-row">
-              <div>
-                <div class="qty-label">Professional — no accommodation <span class="qty-price" id="price-qtyProNoAcc"></span></div>
-                <div class="qty-sub">Without accommodation &amp; food</div>
-              </div>
-              <div class="qty-stepper">
-                <button type="button" data-step="-1" data-qty="qtyProNoAcc">−</button>
-                <input type="number" id="qtyProNoAcc" name="qtyProNoAcc" value="0" min="0" inputmode="numeric" />
-                <button type="button" data-step="1" data-qty="qtyProNoAcc">+</button>
-              </div>
-            </div>
-          </div>
-          <p class="group-hint" id="group-hint">Add at least 5 people to qualify for the group rate.</p>
-
-          <div class="group-total" id="group-total" hidden>
-            <div class="gt-line"><span>Subtotal (before discount)</span><span id="gt-subtotal">$0</span></div>
-            <div class="gt-line"><span id="gt-discount-label">Group discount</span><span id="gt-discount">−$0</span></div>
-            <div class="gt-line gt-total"><span>Total (after discount)</span><span id="gt-total-amount">$0</span></div>
           </div>
         </div>
 
@@ -851,9 +787,10 @@
       <div class="card">
         <p class="card-title">A few more details</p>
 
-        <div class="field">
-          <label>Dietary requirements</label>
+        <div class="field" id="f-dietary">
+          <label>Dietary requirements *</label>
           <input type="text" name="dietary" placeholder="e.g. vegetarian, gluten-free, none" />
+          <p class="field-error">Please let us know your dietary requirements (write "none" if none).</p>
         </div>
 
         <div class="field">
@@ -869,16 +806,6 @@
             <option>Other</option>
           </select>
         </div>
-
-        <div class="field">
-          <label>Referred by — name (optional)</label>
-          <input type="text" name="referredByName" placeholder="Who invited you?" />
-        </div>
-        <div class="field">
-          <label>Referred by — email (optional)</label>
-          <input type="email" name="referredByEmail" placeholder="their@email.com" />
-        </div>
-        <p class="group-hint">Invited by a friend? You and the person who referred you each receive a $10 merchandise voucher (up to 2 referrals each).</p>
 
         <div class="field" style="margin-top:1.1rem;">
           <label>Anything else you'd like us to know? (optional)</label>
@@ -955,72 +882,12 @@
         <div class="order-summary" id="order-summary"></div>
       </div>
 
-      <!-- FICA quiz -->
-      <div class="card" id="quiz-card">
-        <p class="card-title">Before you go — what fish are you?</p>
-        <p class="group-hint" style="margin-top:0;">Take FICA's quick "What Fish Are You?" quiz — a fun way to start your OMC 2026 journey. It only takes a minute.</p>
-        <a class="quiz-cta" href="https://omc2026fishquiz.netlify.app" target="_blank" rel="noopener">Take the quiz</a>
-      </div>
-
       <div class="submit-area">
-        <button class="submit-btn" id="submit-btn" onclick="submitForm()">Complete registration</button>
+        <button class="submit-btn" id="submit-btn" onclick="submitForm()">Continue to payment</button>
         <p class="submit-note">Your information is stored securely and will only be used for OMC 2026 planning.</p>
       </div>
 
     </div><!-- /form-view -->
-
-    <!-- Success screen -->
-    <div id="success-view">
-      <div class="success-icon">✓</div>
-      <h2 id="success-title">You're registered!</h2>
-      <p id="success-message"></p>
-
-      <!-- Payment instructions (individual & group lead) -->
-      <div class="pay-box" id="pay-box" hidden>
-        <div class="pay-amount" id="pay-amount">$0</div>
-        <div class="pay-amount-label">Amount due</div>
-        <div class="pay-method">
-          <span class="pm-label">Zelle</span>
-          <span class="pm-value" id="pay-zelle"></span>
-        </div>
-        <div class="pay-method">
-          <span class="pm-label">Venmo</span>
-          <span class="pm-value" id="pay-venmo"></span>
-        </div>
-        <div class="pay-qr">
-          <figure>
-            <img src="payment barcode/FICA Zelle.jpeg" alt="Zelle QR code" />
-            <figcaption>Scan for Zelle</figcaption>
-          </figure>
-          <figure>
-            <img src="payment barcode/FICA Venmo.jpeg" alt="Venmo QR code" />
-            <figcaption>Scan for Venmo</figcaption>
-          </figure>
-        </div>
-        <div class="pay-ref">
-          Include this reference with your payment:<br />
-          <strong id="pay-ref-value"></strong>
-        </div>
-        <p class="pay-next">Once we receive your payment we'll confirm your spot by email within 3 business days. A copy of these instructions has also been emailed to you.</p>
-      </div>
-
-      <!-- Shareable group link (group lead only) -->
-      <div class="share-box" id="share-box" hidden>
-        <h3>Invite your group</h3>
-        <p>Share this link with the rest of your group. Each person fills in their own details — they won't be asked to pay (you've already covered them).</p>
-        <div class="share-link-row">
-          <input type="text" id="share-link" readonly />
-          <button class="copy-btn" id="copy-link-btn" type="button">Copy</button>
-        </div>
-      </div>
-
-      <!-- FICA quiz (shown to everyone) -->
-      <div class="quiz-box" id="quiz-box">
-        <h3>Haven't taken the quiz yet?</h3>
-        <p>Discover which fish you are with FICA's "What Fish Are You?" quiz.</p>
-        <a class="quiz-cta" href="https://omc2026fishquiz.netlify.app" target="_blank" rel="noopener">Take the quiz</a>
-      </div>
-    </div>
 
   </div><!-- /page-wrap -->
 
@@ -1036,33 +903,20 @@
     // ──────────────────────────────────────────────────────────
     const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwDnHgIAUSzPXTOh8vIZMqfjoG_2TQeolvSpcSXsNyjTzbC_UlvWxL3MPhLFibO5tnb/exec';
 
-    // Payment details shown on the success screen (rev1: Zelle/Venmo).
-    // Fill these in with your real handles before handing off to IT.
-    // Keep these in sync with the same constants in google-apps-script.gs.
-    const PAYMENT = {
-      zelle: 'fica.treasury@gmail.com',   // Zelle email
-      venmo: '@givetofica'                // Venmo handle
-    };
-
-    // Group discount: $10 off per person for groups of this size or larger.
-    const GROUP_MIN = 5;
-    const GROUP_DISCOUNT_PER_PERSON = 10;
+    // Where the registrant goes to pay + upload their receipt after registering.
+    const PAYMENT_PAGE = 'omc-payment.html';
 
     // T-shirts: flat price each, two colours, six sizes (see size chart in form).
     const TSHIRT_PRICE = 25;
     const TSHIRT_SIZES = ['S', 'M', 'L', 'XL', 'XXL', '3XL'];
     const TSHIRT_COLORS = [{ key: 'white', label: 'White' }, { key: 'blue', label: 'Blue' }];
 
-    // Detect group-member mode from the URL (?group=CODE). Members fill in their
-    // own details and don't pay — their group lead already covered them.
-    const urlParams = new URLSearchParams(window.location.search);
-    const memberGroupCode = (urlParams.get('group') || '').trim();
-    let registrationType = memberGroupCode ? 'group-member' : 'individual';
-    let activeGroupCode = memberGroupCode || '';
-
+    // Two ticket tiers, each with an early (discounted) and regular price.
+    // The early price is charged during the early-bird window; the regular
+    // price is shown struck through for context and applies after July 12.
     const PRICING = {
-      student:      { earlyBird: 190, regular: 220, noAcc: 140 },
-      professional: { earlyBird: 260, regular: 290, noAcc: 190 }
+      student:      { full: { early: 190, regular: 220 }, entry: { early: 140, regular: 170 } },
+      professional: { full: { early: 260, regular: 290 }, entry: { early: 190, regular: 220 } }
     };
 
     const REGISTRATION = {
@@ -1089,52 +943,40 @@
     }
 
     function getTicketPrice(category, pkg, period) {
-      const rates = PRICING[category];
-      if (pkg === 'no-acc') return rates.noAcc;
-      return period === 'early-bird' ? rates.earlyBird : rates.regular;
+      const rates = PRICING[category][pkg];
+      return period === 'early-bird' ? rates.early : rates.regular;
+    }
+
+    function pkgLabel(pkg) {
+      return pkg === 'entry' ? 'Conference Entry Ticket' : 'Full Package';
     }
 
     function formatTicketLabel(category, pkg, period, price) {
       const catLabel = category === 'student' ? 'Student' : 'Professional';
-      const pkgLabel = pkg === 'full'
-        ? (period === 'early-bird' ? 'Early bird (full)' : 'Regular (full)')
-        : 'Without accommodation & food';
-      return `${catLabel} — ${pkgLabel} — $${price}`;
-    }
-
-    // Group lead quantity fields → (category, package) mapping.
-    const QTY_FIELDS = [
-      { id: 'qtyStudentFull',  category: 'student',      pkg: 'full'   },
-      { id: 'qtyStudentNoAcc', category: 'student',      pkg: 'no-acc' },
-      { id: 'qtyProFull',      category: 'professional', pkg: 'full'   },
-      { id: 'qtyProNoAcc',     category: 'professional', pkg: 'no-acc' },
-    ];
-
-    function getQty(id) {
-      const el = document.getElementById(id);
-      const n = el ? parseInt(el.value, 10) : 0;
-      return (isNaN(n) || n < 0) ? 0 : n;
-    }
-
-    function getGroupSize() {
-      return QTY_FIELDS.reduce((sum, f) => sum + getQty(f.id), 0);
-    }
-
-    function getGroupTotal(period) {
-      return getGroupBreakdown(period).total;
-    }
-
-    function getGroupCountsLabel() {
-      return QTY_FIELDS
-        .map(f => ({ f, c: getQty(f.id) }))
-        .filter(x => x.c > 0)
-        .map(x => `${x.c}× ${x.f.category}/${x.f.pkg}`)
-        .join(', ');
+      return `${catLabel} — ${pkgLabel(pkg)} — $${price}`;
     }
 
     function updatePricingUI() {
       updateTicketUI();
       updateOrderSummary();
+    }
+
+    // Refresh the price shown on a package card: early price as the primary
+    // amount during the early-bird window, with the regular price struck through.
+    function updatePackageCardPrice(pkg, category, period) {
+      const rates = PRICING[category][pkg];
+      const earlyActive = (period === 'early-bird');
+      const nowEl = document.getElementById('price-' + pkg + '-now');
+      const wasEl = document.getElementById('price-' + pkg + '-was');
+      if (nowEl) nowEl.textContent = `$${earlyActive ? rates.early : rates.regular}`;
+      if (wasEl) {
+        if (earlyActive) {
+          wasEl.textContent = `$${rates.regular}`;
+          wasEl.style.display = '';
+        } else {
+          wasEl.style.display = 'none';
+        }
+      }
     }
 
     function updateTicketUI() {
@@ -1151,57 +993,11 @@
         ? 'Registration opens June 22, 2026'
         : period === 'closed'
           ? 'Registration closed'
-          : (period === 'early-bird' ? 'Early bird pricing · ends July 12' : 'Regular pricing · closes Aug 20');
+          : (period === 'early-bird' ? 'Discounted price · increases July 12' : 'Registration closes Aug 20');
 
-      if (registrationType === 'group-member') {
-        submitBtn.disabled = locked;
-        submitBtn.textContent = locked ? lockedText : 'Reserve my spot';
-        return;
-      }
-
-      if (registrationType === 'group') {
-        const size = getGroupSize();
-        const enough = size >= GROUP_MIN;
-        const hint = document.getElementById('group-hint');
-
-        // Per-ticket unit prices + subtotal (before discount).
-        let subtotal = 0;
-        QTY_FIELDS.forEach(f => {
-          const unit = getTicketPrice(f.category, f.pkg, period);
-          const priceEl = document.getElementById('price-' + f.id);
-          if (priceEl) priceEl.textContent = `$${unit}`;
-          subtotal += getQty(f.id) * unit;
-        });
-        const discount = size * GROUP_DISCOUNT_PER_PERSON;
-        const total = Math.max(subtotal - discount, 0);
-
-        document.getElementById('gt-subtotal').textContent = `$${subtotal}`;
-        document.getElementById('gt-discount-label').textContent =
-          `Group discount ($${GROUP_DISCOUNT_PER_PERSON} × ${size})`;
-        document.getElementById('gt-discount').textContent = `−$${discount}`;
-        document.getElementById('gt-total-amount').textContent = locked ? '—' : `$${total}`;
-        document.getElementById('group-total').hidden = false;
-
-        if (hint) {
-          hint.classList.toggle('warn', !enough);
-          hint.textContent = enough
-            ? `Group of ${size} · $${GROUP_DISCOUNT_PER_PERSON} off each.`
-            : `Add at least ${GROUP_MIN} people to qualify (currently ${size}).`;
-        }
-
-        submitBtn.disabled = locked || !enough;
-        submitBtn.textContent = locked ? lockedText : 'Continue to payment';
-        return;
-      }
-
-      // Individual
       const category = getSelectedCategory();
       const pkg = getSelectedPackage();
-      const price = getTicketPrice(category, pkg, period);
-      const noAccHint = document.getElementById('no-acc-price-hint');
-      noAccHint.textContent = category === 'student'
-        ? `$${PRICING.student.noAcc} · Student`
-        : `$${PRICING.professional.noAcc} · Professional`;
+      ['full', 'entry'].forEach(p => updatePackageCardPrice(p, category, period));
 
       if (locked) {
         labelEl.textContent = period === 'closed' ? 'Registration has closed' : 'Registration not yet open';
@@ -1211,8 +1007,8 @@
         return;
       }
 
-      const periodNote = period === 'early-bird' && pkg === 'full' ? ' · Early bird rate' : '';
-      labelEl.textContent = formatTicketLabel(category, pkg, period, price).replace(` — $${price}`, '') + periodNote;
+      const price = getTicketPrice(category, pkg, period);
+      labelEl.textContent = `${category === 'student' ? 'Student' : 'Professional'} · ${pkgLabel(pkg)}`;
       amountEl.textContent = `$${price}`;
       submitBtn.disabled = false;
       submitBtn.textContent = 'Continue to payment';
@@ -1258,36 +1054,17 @@
       return { qty, total: qty * TSHIRT_PRICE, summary: parts.join(', '), lines: lines };
     }
 
-    // Per-ticket-type line items for the "Ticket Orders" sheet.
-    // Individual: a single line. Group: one line per non-empty quantity field.
+    // Single per-ticket line item for the "Ticket Orders" sheet.
     function getTicketLines(period) {
-      const lines = [];
-      const catLabel = c => (c === 'student' ? 'Student' : 'Professional');
-      if (registrationType === 'group') {
-        QTY_FIELDS.forEach(f => {
-          const qty = getQty(f.id);
-          if (qty > 0) {
-            lines.push({
-              type: catLabel(f.category),
-              accommodation: (f.pkg === 'full'),
-              unitPrice: getTicketPrice(f.category, f.pkg, period),
-              quantity: qty,
-              earlyBird: (period === 'early-bird'),
-            });
-          }
-        });
-      } else if (registrationType !== 'group-member') {
-        const category = getSelectedCategory();
-        const pkg = getSelectedPackage();
-        lines.push({
-          type: catLabel(category),
-          accommodation: (pkg === 'full'),
-          unitPrice: getTicketPrice(category, pkg, period),
-          quantity: 1,
-          earlyBird: (period === 'early-bird'),
-        });
-      }
-      return lines;
+      const category = getSelectedCategory();
+      const pkg = getSelectedPackage();
+      return [{
+        type: category === 'student' ? 'Student' : 'Professional',
+        accommodation: (pkg === 'full'),
+        unitPrice: getTicketPrice(category, pkg, period),
+        quantity: 1,
+        earlyBird: (period === 'early-bird'),
+      }];
     }
 
     function updateTshirtHint() {
@@ -1297,18 +1074,6 @@
       hint.textContent = ts.qty > 0
         ? `${ts.qty} t-shirt${ts.qty > 1 ? 's' : ''} · $${ts.total} — ${ts.summary}`
         : 'Enter a quantity for the colours and sizes you want.';
-    }
-
-    // Group order breakdown: people count, subtotal (pre-discount), discount, total.
-    function getGroupBreakdown(period) {
-      let subtotal = 0;
-      QTY_FIELDS.forEach(f => {
-        subtotal += getQty(f.id) * getTicketPrice(f.category, f.pkg, period);
-      });
-      const size = getGroupSize();
-      const discount = size * GROUP_DISCOUNT_PER_PERSON;
-      const total = Math.max(subtotal - discount, 0);
-      return { size, subtotal, discount, total };
     }
 
     function osLine(label, amount, isTotal) {
@@ -1323,19 +1088,8 @@
       const ts = getTshirtData();
       const money = v => (locked ? '—' : `$${v}`);
       const rows = [];
-      let ticketCost = 0;
-
-      if (registrationType === 'group') {
-        const b = getGroupBreakdown(period);
-        ticketCost = b.total;
-        rows.push(osLine(`Subtotal (${b.size} ${b.size === 1 ? 'person' : 'people'})`, money(b.subtotal)));
-        rows.push(osLine(`Group discount ($${GROUP_DISCOUNT_PER_PERSON} × ${b.size})`, locked ? '—' : `−$${b.discount}`));
-      } else if (registrationType === 'group-member') {
-        rows.push(osLine('Registration (covered by group lead)', '$0'));
-      } else {
-        ticketCost = getTicketPrice(getSelectedCategory(), getSelectedPackage(), period);
-        rows.push(osLine('Registration', money(ticketCost)));
-      }
+      const ticketCost = getTicketPrice(getSelectedCategory(), getSelectedPackage(), period);
+      rows.push(osLine(`Registration (${pkgLabel(getSelectedPackage())})`, money(ticketCost)));
 
       // Itemise each t-shirt (colour + size), then a t-shirt subtotal line.
       if (ts.lines.length) {
@@ -1349,35 +1103,6 @@
       box.innerHTML = rows.join('');
     }
 
-    function applyMode() {
-      const pathCard = document.getElementById('path-card');
-      const memberBanner = document.getElementById('member-banner');
-      const individualTicket = document.getElementById('individual-ticket');
-      const groupTicket = document.getElementById('group-ticket');
-      const priceBox = document.getElementById('selected-price-box');
-      const ticketCard = document.getElementById('ticket-card');
-
-      if (registrationType === 'group-member') {
-        pathCard.hidden = true;
-        ticketCard.hidden = true;
-        memberBanner.hidden = false;
-        memberBanner.innerHTML = `You're joining group <strong>${activeGroupCode}</strong>. Fill in your details below — your spot is already covered by your group lead, so there's nothing to pay.`;
-      } else if (registrationType === 'group') {
-        memberBanner.hidden = true;
-        ticketCard.hidden = false;
-        individualTicket.hidden = true;
-        groupTicket.hidden = false;
-        priceBox.style.display = 'none';
-      } else {
-        memberBanner.hidden = true;
-        ticketCard.hidden = false;
-        individualTicket.hidden = false;
-        groupTicket.hidden = true;
-        priceBox.style.display = 'flex';
-      }
-      updatePricingUI();
-    }
-
     function bindTicketGroup(groupId) {
       document.querySelectorAll(`#${groupId} .ticket`).forEach(t => {
         t.addEventListener('click', () => {
@@ -1388,30 +1113,6 @@
         });
       });
     }
-
-    // Path selector
-    document.querySelectorAll('#path-group .ticket').forEach(t => {
-      t.addEventListener('click', () => {
-        document.querySelectorAll('#path-group .ticket').forEach(x => x.classList.remove('selected'));
-        t.classList.add('selected');
-        t.querySelector('input').checked = true;
-        registrationType = t.dataset.path === 'group' ? 'group' : 'individual';
-        applyMode();
-      });
-    });
-
-    // Group quantity steppers
-    document.querySelectorAll('.qty-stepper button').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const input = document.getElementById(btn.dataset.qty);
-        const step = parseInt(btn.dataset.step, 10);
-        input.value = Math.max(0, (parseInt(input.value, 10) || 0) + step);
-        updatePricingUI();
-      });
-    });
-    document.querySelectorAll('#group-ticket input[type=number]').forEach(input => {
-      input.addEventListener('input', updatePricingUI);
-    });
 
     bindTicketGroup('category-group');
     bindTicketGroup('package-group');
@@ -1433,7 +1134,7 @@
       updateOrderSummary();
     });
 
-    applyMode();
+    updatePricingUI();
 
     function getVal(name) {
       const el = document.querySelector(`[name="${name}"]`);
@@ -1456,18 +1157,19 @@
       const wantsUpdates = document.getElementById('updates').checked ? 'Yes' : 'No';
       const ts = getTshirtData();
       return Object.assign({
+        action: 'register',
         timestamp: new Date().toISOString(),
         firstName: getVal('firstName'),
         lastName: getVal('lastName'),
         email: getVal('email'),
         phone: getVal('phone'),
         city: getVal('city'),
+        state: getVal('state'),
+        school: getVal('school'),
         church: getVal('church'),
         role: getVal('role'),
         dietary: getVal('dietary'),
         referral: getVal('referral'),
-        referredByName: getVal('referredByName'),
-        referredByEmail: getVal('referredByEmail'),
         notes: getVal('notes'),
         marketingOptIn: wantsUpdates,
         groupName: '',
@@ -1487,89 +1189,57 @@
       }, extra);
     }
 
-    function showSuccess(info) {
-      document.getElementById('form-view').style.display = 'none';
-      document.getElementById('success-view').style.display = 'block';
-
-      const title = document.getElementById('success-title');
-      const message = document.getElementById('success-message');
-      const payBox = document.getElementById('pay-box');
-      const shareBox = document.getElementById('share-box');
-      payBox.hidden = true;
-      shareBox.hidden = true;
-
-      if (info.type === 'group-member') {
-        title.textContent = "You're on the list!";
-        if (info.amount > 0) {
-          message.innerHTML = `Your spot in group <strong>${info.code}</strong> is reserved — your registration is covered by your group lead. You added <strong>$${info.amount}</strong> of t-shirts; please complete payment below to confirm your order.`;
-          document.getElementById('pay-amount').textContent = `$${info.amount}`;
-          document.getElementById('pay-zelle').textContent = PAYMENT.zelle;
-          document.getElementById('pay-venmo').textContent = PAYMENT.venmo;
-          document.getElementById('pay-ref-value').textContent = `${info.code} ${info.name}`;
-          payBox.hidden = false;
-        } else {
-          message.innerHTML = `Your spot in group <strong>${info.code}</strong> is reserved — your group lead has covered your registration. A confirmation has been emailed to you.`;
-        }
-      } else {
-        title.textContent = 'Almost done — please pay to confirm';
-        const hasCode = info.type === 'group-lead' && info.code;
-
-        if (info.type === 'group-lead') {
-          message.innerHTML = hasCode
-            ? `Thanks! Your group <strong>${info.code}</strong> is reserved. Complete payment below to confirm everyone's spot.`
-            : `Thanks! Your group has been created — we've emailed your group name and shareable link. Complete payment below to confirm everyone's spot.`;
-        } else {
-          message.innerHTML = `Thanks for registering for OMC 2026. Complete your payment below to confirm your spot.`;
-        }
-
-        document.getElementById('pay-amount').textContent = `$${info.amount}`;
-        document.getElementById('pay-zelle').textContent = PAYMENT.zelle;
-        document.getElementById('pay-venmo').textContent = PAYMENT.venmo;
-        document.getElementById('pay-ref-value').textContent =
-          hasCode ? `${info.code} ${info.name}` : info.name;
-        payBox.hidden = false;
-
-        if (hasCode) {
-          document.getElementById('share-link').value =
-            `${location.origin}${location.pathname}?group=${encodeURIComponent(info.code)}`;
-          shareBox.hidden = false;
-        }
-      }
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Hand off to the payment page, carrying everything it needs to show the
+    // amount due, payment reference, and (for students) the student-ID upload.
+    function goToPayment(info) {
+      const params = new URLSearchParams({
+        regId: info.regId || '',
+        amount: String(info.amount || 0),
+        name: info.name || '',
+        email: info.email || '',
+        category: info.category || '',
+        ref: info.ref || info.name || '',
+      });
+      window.location.href = `${PAYMENT_PAGE}?${params.toString()}`;
     }
-
-    document.getElementById('copy-link-btn').addEventListener('click', () => {
-      const input = document.getElementById('share-link');
-      input.select();
-      if (navigator.clipboard) navigator.clipboard.writeText(input.value);
-      else document.execCommand('copy');
-      const btn = document.getElementById('copy-link-btn');
-      btn.textContent = 'Copied';
-      setTimeout(() => { btn.textContent = 'Copy'; }, 1500);
-    });
 
     async function submitForm() {
       // Clear previous errors
-      ['f-firstname','f-lastname','f-email'].forEach(id => setError(id, false));
+      ['f-firstname','f-lastname','f-email','f-phone','f-city','f-state','f-dietary'].forEach(id => setError(id, false));
       document.getElementById('status-msg').className = 'status-msg';
 
-      // Validate personal fields (all paths)
+      // Validate required fields
       let valid = true;
       if (!getVal('firstName')) { setError('f-firstname', true); valid = false; }
       if (!getVal('lastName'))  { setError('f-lastname', true);  valid = false; }
       const email = getVal('email');
       if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setError('f-email', true); valid = false; }
+      if (!getVal('phone'))   { setError('f-phone', true);   valid = false; }
+      if (!getVal('city'))    { setError('f-city', true);    valid = false; }
+      if (!getVal('state'))   { setError('f-state', true);   valid = false; }
+      if (!getVal('dietary')) { setError('f-dietary', true); valid = false; }
       if (!document.getElementById('terms').checked) {
         showStatus('Please accept the terms & conditions to continue.', 'error');
         valid = false;
       }
       if (!valid) return;
 
+      const period = getPricingPeriod();
+      if (period === 'not-open') { showStatus('Registration opens on June 22, 2026.', 'error'); return; }
+      if (period === 'closed') { showStatus('Registration has closed. Contact us if you need assistance.', 'error'); return; }
+
+      const fullName = `${getVal('firstName')} ${getVal('lastName')}`;
+      const category = getSelectedCategory();
+      const pkg = getSelectedPackage();
+      const tshirt = getTshirtData();
+      const price = getTicketPrice(category, pkg, period);
+      const total = price + tshirt.total;
+
       // Honeypot: a real user can't see or focus the hidden "website" field,
-      // so if it has a value the submission is almost certainly a bot. Show
-      // the success screen (so the bot doesn't retry) but send nothing.
+      // so if it has a value the submission is almost certainly a bot. Send
+      // nothing and quietly move on so the bot doesn't retry.
       if (getVal('website')) {
-        showSuccess({ type: 'individual', amount: 0, name: '' });
+        window.location.href = 'omc-thankyou.html';
         return;
       }
 
@@ -1578,113 +1248,46 @@
         return;
       }
 
-      const period = getPricingPeriod();
-      if (period === 'not-open') { showStatus('Registration opens on June 22, 2026.', 'error'); return; }
-      if (period === 'closed') { showStatus('Registration has closed. Contact us if you need assistance.', 'error'); return; }
-
-      const fullName = `${getVal('firstName')} ${getVal('lastName')}`;
-      const tshirt = getTshirtData();
-      const ticketLines = getTicketLines(period);
-      let payload, successInfo;
-
-      if (registrationType === 'group') {
-        const size = getGroupSize();
-        if (size < GROUP_MIN) { showStatus(`Groups need at least ${GROUP_MIN} people. Add more to continue.`, 'error'); return; }
-
-        const b = getGroupBreakdown(period);
-        const total = b.total + tshirt.total;
-        // The group name is assigned by the server (group-1, group-2, ...).
-        // We send our page URL so the script can email a working share link.
-        payload = basePayload({
-          registrationType: 'group-lead',
-          regTicketType: 'Group',
-          ticket: `Group lead — ${getGroupCountsLabel()}`,
-          groupSize: size,
-          ticketBeforeDiscount: b.subtotal,
-          ticketDiscount: b.discount,
-          ticketAfterDiscount: b.total,
-          amountDue: total,
-          ticketLines: ticketLines,
-          baseUrl: location.origin + location.pathname,
-        });
-        successInfo = { type: 'group-lead', amount: total, name: fullName };
-
-      } else if (registrationType === 'group-member') {
-        payload = basePayload({
-          registrationType: 'group-member',
-          regTicketType: 'Group member',
-          ticket: 'Group member (covered by lead)',
-          groupCode: activeGroupCode,
-          ticketBeforeDiscount: 0,
-          ticketDiscount: 0,
-          ticketAfterDiscount: 0,
-          amountDue: tshirt.total,
-          ticketLines: [],
-        });
-        successInfo = { type: 'group-member', code: activeGroupCode, amount: tshirt.total, name: fullName };
-
-      } else {
-        const category = getSelectedCategory();
-        const pkg = getSelectedPackage();
-        const price = getTicketPrice(category, pkg, period);
-        const total = price + tshirt.total;
-        payload = basePayload({
-          registrationType: 'individual',
-          regTicketType: category === 'student' ? 'Student' : 'Professional',
-          ticket: formatTicketLabel(category, pkg, period, price),
-          ticketBeforeDiscount: price,
-          ticketDiscount: 0,
-          ticketAfterDiscount: price,
-          amountDue: total,
-          ticketLines: ticketLines,
-        });
-        successInfo = { type: 'individual', amount: total, name: fullName };
-      }
+      const payload = basePayload({
+        registrationType: 'individual',
+        regTicketType: category === 'student' ? 'Student' : 'Professional',
+        ticket: formatTicketLabel(category, pkg, period, price),
+        ticketBeforeDiscount: price,
+        ticketDiscount: 0,
+        ticketAfterDiscount: price,
+        amountDue: total,
+        ticketLines: getTicketLines(period),
+      });
 
       const btn = document.getElementById('submit-btn');
       btn.disabled = true;
       btn.textContent = 'Submitting…';
 
+      // Readable POST (text/plain avoids a CORS preflight the Apps Script
+      // can't answer) so we can read back the server-assigned Registration ID.
+      let regId = '';
       try {
-        if (registrationType === 'group') {
-          // Group leads need the server-assigned name back, so we use a
-          // readable request. A text/plain body avoids a CORS preflight the
-          // Apps Script can't answer; the script returns JSON with groupCode.
-          let assignedCode = '';
-          try {
-            const res = await fetch(APPS_SCRIPT_URL, {
-              method: 'POST',
-              headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-              body: JSON.stringify(payload),
-            });
-            const json = await res.json();
-            assignedCode = (json && json.groupCode) ? json.groupCode : '';
-          } catch (readErr) {
-            // The row is saved server-side; we just couldn't read the name.
-            // The lead still gets it (and the link) by email.
-            assignedCode = '';
-          }
-          activeGroupCode = assignedCode;
-          successInfo.code = assignedCode;
-          showSuccess(successInfo);
-        } else {
-          // Individual + member: fire-and-forget. Apps Script web apps don't
-          // send CORS headers, so we POST in "no-cors" mode with a text/plain
-          // body (avoids a preflight the script can't answer). We can't read
-          // the response in this mode, so a resolved fetch is treated as success.
-          await fetch(APPS_SCRIPT_URL, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body: JSON.stringify(payload),
-          });
-          showSuccess(successInfo);
-        }
-      } catch (err) {
-        showStatus('Something went wrong. Please try again or contact us directly.', 'error');
-        btn.disabled = false;
-        updatePricingUI();
+        const res = await fetch(APPS_SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(payload),
+        });
+        const json = await res.json();
+        regId = (json && json.registrationId) ? String(json.registrationId) : '';
+      } catch (readErr) {
+        // The row is saved server-side; we just couldn't read the ID back.
+        // The payment page still works without it (it falls back to the name).
+        regId = '';
       }
+
+      goToPayment({
+        regId: regId,
+        amount: total,
+        name: fullName,
+        email: email,
+        category: category,
+        ref: fullName,
+      });
     }
   </script>
 
