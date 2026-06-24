@@ -951,7 +951,7 @@
       <!-- T-shirt -->
       <div class="card" id="tshirt-card">
         <p class="card-title">OMC 2026 t-shirt</p>
-        <p class="group-hint" style="margin-top:0;">Take home the "Filled to Overflow" tee — $25 each, available in white and blue.</p>
+        <p class="group-hint" id="tshirt-price-hint" style="margin-top:0;">Take home the "Filled to Overflow" tee — $25 each, available in white and blue.</p>
 
         <img class="tshirt-options-img" src="t-shirt/Tshirt%20Options.jpeg" alt="OMC 2026 'Filled to Overflow' t-shirt designs in blue and white" />
 
@@ -965,7 +965,7 @@
           <div class="ticket" data-tshirt="yes">
             <input type="radio" name="tshirtChoice" value="yes" />
             <div class="t-name">Yes, add t-shirts</div>
-            <div class="t-price">$25 each</div>
+            <div class="t-price" id="tshirt-toggle-price">$25 each</div>
           </div>
         </div>
 
@@ -981,15 +981,15 @@
           <details class="size-guide">
             <summary>View size chart (cm)</summary>
             <table class="size-chart">
-              <caption>A = half-chest width (flat) · B = body length</caption>
-              <thead><tr><th>Size</th><th>A (cm)</th><th>B (cm)</th></tr></thead>
+              <caption>W = chest width (flat) · L = body length</caption>
+              <thead><tr><th>Size</th><th>W (cm)</th><th>L (cm)</th></tr></thead>
               <tbody>
-                <tr><td>S</td><td>48</td><td>67</td></tr>
-                <tr><td>M</td><td>50</td><td>69</td></tr>
-                <tr><td>L</td><td>52</td><td>71</td></tr>
-                <tr><td>XL</td><td>54</td><td>73</td></tr>
-                <tr><td>XXL</td><td>56</td><td>75</td></tr>
-                <tr><td>3XL</td><td>58</td><td>77</td></tr>
+                <tr><td>S</td><td>46</td><td>66</td></tr>
+                <tr><td>M</td><td>48.5</td><td>68.5</td></tr>
+                <tr><td>L</td><td>51</td><td>71</td></tr>
+                <tr><td>XL</td><td>53.5</td><td>73.5</td></tr>
+                <tr><td>XXL</td><td>56</td><td>76</td></tr>
+                <tr><td>3XL</td><td>58.5</td><td>78.5</td></tr>
               </tbody>
             </table>
             <img class="size-chart-img" src="t-shirt/Tshirt%20Size.png" alt="OMC 2026 t-shirt size chart" />
@@ -1044,7 +1044,14 @@
     const PAYMENT_PAGE = 'omc-payment.html';
 
     // T-shirts: flat price each, two colours, six sizes (see size chart in form).
-    const TSHIRT_PRICE = 25;
+    // T-shirts are $22 now; the price rises to $25 after July 20, 2026. The
+    // early price shows with the regular price struck through (like the tickets).
+    const TSHIRT_EARLY_PRICE = 22;
+    const TSHIRT_REGULAR_PRICE = 25;
+    const TSHIRT_PRICE_INCREASE = new Date('2026-07-20T00:00:00');
+    function getTshirtPrice() {
+      return (new Date() < TSHIRT_PRICE_INCREASE) ? TSHIRT_EARLY_PRICE : TSHIRT_REGULAR_PRICE;
+    }
     const TSHIRT_SIZES = ['S', 'M', 'L', 'XL', 'XXL', '3XL'];
     const TSHIRT_COLORS = [{ key: 'white', label: 'White' }, { key: 'blue', label: 'Blue' }];
 
@@ -1097,6 +1104,25 @@
       updateTicketUI();
       updateOrderSummary();
       updateCategoryFields();
+      updateTshirtPriceUI();
+    }
+
+    // Show the t-shirt price ($22 now, $25 struck through), or plain $25 after
+    // the July 20 increase.
+    function updateTshirtPriceUI() {
+      const early = (new Date() < TSHIRT_PRICE_INCREASE);
+      const priceEl = document.getElementById('tshirt-toggle-price');
+      const hintEl = document.getElementById('tshirt-price-hint');
+      if (priceEl) {
+        priceEl.innerHTML = early
+          ? `$${TSHIRT_EARLY_PRICE} each <s style="opacity:.6;">$${TSHIRT_REGULAR_PRICE}</s>`
+          : `$${TSHIRT_REGULAR_PRICE} each`;
+      }
+      if (hintEl) {
+        hintEl.innerHTML = early
+          ? `Take home the "Filled to Overflow" tee — <strong>$${TSHIRT_EARLY_PRICE}</strong> each (<s>$${TSHIRT_REGULAR_PRICE}</s>, price increases July 20), available in white and blue.`
+          : `Take home the "Filled to Overflow" tee — $${TSHIRT_REGULAR_PRICE} each, available in white and blue.`;
+      }
     }
 
     // Show the Student detail fields when "Student" is selected, the
@@ -1200,11 +1226,11 @@
           if (n > 0) {
             qty += n;
             parts.push(`${n}× ${c.label} ${size}`);
-            lines.push({ color: c.label, size: size, quantity: n });
+            lines.push({ color: c.label, size: size, quantity: n, unitPrice: getTshirtPrice() });
           }
         });
       });
-      return { qty, total: qty * TSHIRT_PRICE, summary: parts.join(', '), lines: lines };
+      return { qty, total: qty * getTshirtPrice(), summary: parts.join(', '), lines: lines };
     }
 
     // Single per-ticket line item for the "Ticket Orders" sheet.
@@ -1247,7 +1273,7 @@
       // Itemise each t-shirt (colour + size), then a t-shirt subtotal line.
       if (ts.lines.length) {
         ts.lines.forEach(ln => {
-          rows.push(osLine(`T-shirt — ${ln.color} ${ln.size} (${ln.quantity} × $${TSHIRT_PRICE})`, `$${ln.quantity * TSHIRT_PRICE}`));
+          rows.push(osLine(`T-shirt — ${ln.color} ${ln.size} (${ln.quantity} × $${getTshirtPrice()})`, `$${ln.quantity * getTshirtPrice()}`));
         });
         rows.push(osLine(`Total t-shirts (${ts.qty})`, `$${ts.total}`));
       }

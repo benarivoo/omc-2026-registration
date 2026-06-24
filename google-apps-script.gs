@@ -610,7 +610,7 @@ function getOrderBreakdown_(type, data) {
   if (lines.length) {
     lines.forEach(function (ln) {
       var q = Number(ln.quantity) || 0;
-      rows.push(['T-shirt — ' + ln.color + ' ' + ln.size + ' (' + q + ' \u00D7 $' + TSHIRT_PRICE + ')', '$' + (q * TSHIRT_PRICE)]);
+      rows.push(['T-shirt — ' + ln.color + ' ' + ln.size + ' (' + q + ' \u00D7 $' + (Number(ln.unitPrice) || TSHIRT_PRICE) + ')', '$' + (q * (Number(ln.unitPrice) || TSHIRT_PRICE))]);
     });
     rows.push(['Total t-shirts (' + (Number(data.tshirtQty) || 0) + ')', '$' + (Number(data.tshirtTotal) || 0)]);
   }
@@ -762,7 +762,8 @@ function writeTshirtOrders_(data) {
   var sheet = getOrCreateSheet_(TSHIRT_SHEET_NAME, TSHIRT_COLUMNS);
   var rows = lines.map(function (ln) {
     var qty = Number(ln.quantity) || 0;
-    return [data.registrationId, ln.color, ln.size, qty, TSHIRT_PRICE, qty * TSHIRT_PRICE, getNextTshirtOrderId_()];
+    var unit = Number(ln.unitPrice) || TSHIRT_PRICE;
+    return [data.registrationId, ln.color, ln.size, qty, unit, qty * unit, getNextTshirtOrderId_()];
   });
   sheet.getRange(sheet.getLastRow() + 1, 1, rows.length, TSHIRT_COLUMNS.length).setValues(rows);
 }
