@@ -771,7 +771,7 @@
         <p class="card-title">Registration &amp; pricing</p>
 
         <ul class="pricing-schedule">
-          <li><strong>Price increases July 12</strong> · Registration ends August 20</li>
+          <li><strong>Price increases July 13</strong> · Registration ends August 20</li>
         </ul>
 
         <div id="period-badge" class="pricing-period-badge" hidden></div>
@@ -1066,7 +1066,8 @@
     const REGISTRATION = {
       // Opened early for testing. Set back to '2026-06-22T00:00:00' for launch.
       open: new Date('2026-01-01T00:00:00'),
-      earlyBirdEnd: new Date('2026-07-11T23:59:59'),
+      // Early-bird price applies through July 12; increases July 13 at 00:00:00 PST.
+      earlyBirdEnd: new Date('2026-07-12T23:59:59-08:00'),
       close: new Date('2026-08-20T23:59:59')
     };
 
