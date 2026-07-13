@@ -700,6 +700,26 @@
         <input type="text" id="hp-website" name="website" tabindex="-1" autocomplete="off" />
       </div>
 
+      <!-- Group member banner (shown when arriving via a group link) -->
+      <div class="member-banner" id="member-banner" hidden></div>
+
+      <!-- Registration path (revealed on/after July 13; individual-only before) -->
+      <div class="card" id="path-card" hidden>
+        <p class="card-title">How are you registering?</p>
+        <div class="ticket-grid path-grid" id="path-group">
+          <div class="ticket selected" data-path="individual">
+            <input type="radio" name="path" value="individual" checked />
+            <div class="t-name">Just me</div>
+            <div class="t-price">Individual registration</div>
+          </div>
+          <div class="ticket" data-path="group">
+            <input type="radio" name="path" value="group" />
+            <div class="t-name">A group (5+)</div>
+            <div class="t-price">$10 off each person</div>
+          </div>
+        </div>
+      </div>
+
       <!-- Personal info -->
       <div class="card">
         <p class="card-title">Personal details</p>
@@ -868,6 +888,66 @@
           </div>
         </div>
 
+        <!-- Group lead selection (shown when the "A group" path is chosen) -->
+        <div id="group-ticket" hidden>
+          <p class="group-hint" style="margin-top:0;">Register everyone in your group and pay the discounted total. You'll get a shareable link so each person can fill in their own details — their spot is already covered.</p>
+
+          <p class="ticket-section-label">How many people? (5+ total)</p>
+          <div class="qty-list">
+            <div class="qty-row">
+              <div>
+                <div class="qty-label">Student — Full Package <span class="qty-price" id="price-qtyStudentFull"></span></div>
+                <div class="qty-sub">Conference · accommodation · meals</div>
+              </div>
+              <div class="qty-stepper">
+                <button type="button" data-step="-1" data-qty="qtyStudentFull">−</button>
+                <input type="number" id="qtyStudentFull" name="qtyStudentFull" value="0" min="0" inputmode="numeric" />
+                <button type="button" data-step="1" data-qty="qtyStudentFull">+</button>
+              </div>
+            </div>
+            <div class="qty-row">
+              <div>
+                <div class="qty-label">Student — Conference Entry <span class="qty-price" id="price-qtyStudentEntry"></span></div>
+                <div class="qty-sub">Conference only</div>
+              </div>
+              <div class="qty-stepper">
+                <button type="button" data-step="-1" data-qty="qtyStudentEntry">−</button>
+                <input type="number" id="qtyStudentEntry" name="qtyStudentEntry" value="0" min="0" inputmode="numeric" />
+                <button type="button" data-step="1" data-qty="qtyStudentEntry">+</button>
+              </div>
+            </div>
+            <div class="qty-row">
+              <div>
+                <div class="qty-label">Professional — Full Package <span class="qty-price" id="price-qtyProFull"></span></div>
+                <div class="qty-sub">Conference · accommodation · meals</div>
+              </div>
+              <div class="qty-stepper">
+                <button type="button" data-step="-1" data-qty="qtyProFull">−</button>
+                <input type="number" id="qtyProFull" name="qtyProFull" value="0" min="0" inputmode="numeric" />
+                <button type="button" data-step="1" data-qty="qtyProFull">+</button>
+              </div>
+            </div>
+            <div class="qty-row">
+              <div>
+                <div class="qty-label">Professional — Conference Entry <span class="qty-price" id="price-qtyProEntry"></span></div>
+                <div class="qty-sub">Conference only</div>
+              </div>
+              <div class="qty-stepper">
+                <button type="button" data-step="-1" data-qty="qtyProEntry">−</button>
+                <input type="number" id="qtyProEntry" name="qtyProEntry" value="0" min="0" inputmode="numeric" />
+                <button type="button" data-step="1" data-qty="qtyProEntry">+</button>
+              </div>
+            </div>
+          </div>
+          <p class="group-hint" id="group-hint">Add at least 5 people to qualify for the group rate.</p>
+
+          <div class="group-total" id="group-total" hidden>
+            <div class="gt-line"><span>Subtotal (before discount)</span><span id="gt-subtotal">$0</span></div>
+            <div class="gt-line"><span id="gt-discount-label">Group discount</span><span id="gt-discount">−$0</span></div>
+            <div class="gt-line gt-total"><span>Total (after discount)</span><span id="gt-total-amount">$0</span></div>
+          </div>
+        </div>
+
         <div class="selected-price-box" id="selected-price-box">
           <span class="sp-label" id="selected-price-label">Your selected ticket</span>
           <span class="sp-amount" id="selected-price-amount">$190</span>
@@ -940,6 +1020,18 @@
             <option>Previous OMC attendee</option>
             <option>Other</option>
           </select>
+        </div>
+
+        <!-- Referral tracking (revealed on/after July 13) -->
+        <div id="referral-fields" hidden>
+          <div class="field">
+            <label>Referred by — name (optional)</label>
+            <input type="text" name="referredByName" placeholder="Who invited you?" />
+          </div>
+          <div class="field">
+            <label>Referred by — email (optional)</label>
+            <input type="email" name="referredByEmail" placeholder="their@email.com" />
+          </div>
         </div>
 
         <div class="field" style="margin-top:1.1rem;">
@@ -1071,6 +1163,53 @@
       close: new Date('2026-08-20T23:59:59')
     };
 
+    // Group registration + referral go live at this instant (the same cutover as
+    // regular pricing). Before then the form behaves exactly as individual-only.
+    const GROUP_REFERRAL_LAUNCH = new Date('2026-07-13T00:00:00-08:00');
+    const groupReferralLive = () => new Date() >= GROUP_REFERRAL_LAUNCH;
+
+    // Group discount: $10 off per person for groups of this size or larger.
+    const GROUP_MIN = 5;
+    const GROUP_DISCOUNT_PER_PERSON = 10;
+
+    // Group lead quantity fields → (category, package) mapping (current model).
+    const QTY_FIELDS = [
+      { id: 'qtyStudentFull',  category: 'student',      pkg: 'full'  },
+      { id: 'qtyStudentEntry', category: 'student',      pkg: 'entry' },
+      { id: 'qtyProFull',      category: 'professional', pkg: 'full'  },
+      { id: 'qtyProEntry',     category: 'professional', pkg: 'entry' },
+    ];
+
+    // Registration path. Members arrive via ?group=CODE — only honoured once
+    // group registration is live; otherwise the form stays individual-only.
+    let registrationType = 'individual';
+    let activeGroupCode = '';
+    if (groupReferralLive()) {
+      const memberGroupCode = (new URLSearchParams(location.search).get('group') || '').trim();
+      if (memberGroupCode) { registrationType = 'group-member'; activeGroupCode = memberGroupCode; }
+    }
+
+    function getQty(id) {
+      const el = document.getElementById(id);
+      const n = el ? parseInt(el.value, 10) : 0;
+      return (isNaN(n) || n < 0) ? 0 : n;
+    }
+    function getGroupSize() {
+      return QTY_FIELDS.reduce((sum, f) => sum + getQty(f.id), 0);
+    }
+    // Group order breakdown: people count, subtotal (pre-discount), discount, total.
+    function getGroupBreakdown(period) {
+      let subtotal = 0;
+      QTY_FIELDS.forEach(f => { subtotal += getQty(f.id) * getTicketPrice(f.category, f.pkg, period); });
+      const size = getGroupSize();
+      const discount = size * GROUP_DISCOUNT_PER_PERSON;
+      return { size, subtotal, discount, total: Math.max(subtotal - discount, 0) };
+    }
+    function getGroupCountsLabel() {
+      return QTY_FIELDS.map(f => ({ f, c: getQty(f.id) })).filter(x => x.c > 0)
+        .map(x => `${x.c}× ${x.f.category}/${x.f.pkg}`).join(', ');
+    }
+
     function getPricingPeriod() {
       const now = new Date();
       if (now < REGISTRATION.open) return 'not-open';
@@ -1131,14 +1270,17 @@
     // accommodation-night picker when the Full Package (with accommodation) is
     // selected.
     function updateCategoryFields() {
+      // Category / package detail fields only apply to an individual registrant.
+      // In group-lead / group-member mode they stay hidden.
+      const individual = (registrationType === 'individual');
       const isStudent = getSelectedCategory() === 'student';
       const studentEl = document.getElementById('student-fields');
       const proEl = document.getElementById('professional-fields');
-      if (studentEl) studentEl.hidden = !isStudent;
-      if (proEl) proEl.hidden = isStudent;
+      if (studentEl) studentEl.hidden = !individual || !isStudent;
+      if (proEl) proEl.hidden = !individual || isStudent;
 
       const accomEl = document.getElementById('accommodation-nights');
-      if (accomEl) accomEl.hidden = (getSelectedPackage() !== 'full');
+      if (accomEl) accomEl.hidden = !individual || (getSelectedPackage() !== 'full');
     }
 
     // Refresh the price shown on a package card: early price as the primary
@@ -1173,7 +1315,44 @@
         ? 'Registration opens June 22, 2026'
         : period === 'closed'
           ? 'Registration closed'
-          : (period === 'early-bird' ? 'Discounted price · increases July 12' : 'Registration closes Aug 20');
+          : (period === 'early-bird' ? 'Discounted price · increases July 13' : 'Registration closes Aug 20');
+
+      // Group member: registration is covered by the lead — nothing to price.
+      if (registrationType === 'group-member') {
+        submitBtn.disabled = locked;
+        submitBtn.textContent = locked ? lockedText : 'Reserve my spot';
+        return;
+      }
+
+      // Group lead: price the entered quantities and enforce the 5+ minimum.
+      if (registrationType === 'group') {
+        const size = getGroupSize();
+        const enough = size >= GROUP_MIN;
+        const hint = document.getElementById('group-hint');
+        let subtotal = 0;
+        QTY_FIELDS.forEach(f => {
+          const unit = getTicketPrice(f.category, f.pkg, period);
+          const priceEl = document.getElementById('price-' + f.id);
+          if (priceEl) priceEl.textContent = `$${unit}`;
+          subtotal += getQty(f.id) * unit;
+        });
+        const discount = size * GROUP_DISCOUNT_PER_PERSON;
+        const total = Math.max(subtotal - discount, 0);
+        document.getElementById('gt-subtotal').textContent = `$${subtotal}`;
+        document.getElementById('gt-discount-label').textContent = `Group discount ($${GROUP_DISCOUNT_PER_PERSON} × ${size})`;
+        document.getElementById('gt-discount').textContent = `−$${discount}`;
+        document.getElementById('gt-total-amount').textContent = locked ? '—' : `$${total}`;
+        document.getElementById('group-total').hidden = false;
+        if (hint) {
+          hint.classList.toggle('warn', !enough);
+          hint.textContent = enough
+            ? `Group of ${size} · $${GROUP_DISCOUNT_PER_PERSON} off each.`
+            : `Add at least ${GROUP_MIN} people to qualify (currently ${size}).`;
+        }
+        submitBtn.disabled = locked || !enough;
+        submitBtn.textContent = locked ? lockedText : 'Continue to payment';
+        return;
+      }
 
       const category = getSelectedCategory();
       const pkg = getSelectedPackage();
@@ -1234,12 +1413,25 @@
       return { qty, total: qty * getTshirtPrice(), summary: parts.join(', '), lines: lines };
     }
 
-    // Single per-ticket line item for the "Ticket Orders" sheet.
+    // Per-ticket-type line items for the "Ticket Orders" sheet.
+    // Individual: a single line. Group lead: one line per non-empty quantity
+    // field (the backend adds the group-discount row itself). Member: none.
     function getTicketLines(period) {
+      const catLabel = c => (c === 'student' ? 'Student' : 'Professional');
+      if (registrationType === 'group') {
+        return QTY_FIELDS.filter(f => getQty(f.id) > 0).map(f => ({
+          type: catLabel(f.category),
+          accommodation: (f.pkg === 'full'),
+          unitPrice: getTicketPrice(f.category, f.pkg, period),
+          quantity: getQty(f.id),
+          earlyBird: (period === 'early-bird'),
+        }));
+      }
+      if (registrationType === 'group-member') return [];
       const category = getSelectedCategory();
       const pkg = getSelectedPackage();
       return [{
-        type: category === 'student' ? 'Student' : 'Professional',
+        type: catLabel(category),
         accommodation: (pkg === 'full'),
         unitPrice: getTicketPrice(category, pkg, period),
         quantity: 1,
@@ -1268,8 +1460,18 @@
       const ts = getTshirtData();
       const money = v => (locked ? '—' : `$${v}`);
       const rows = [];
-      const ticketCost = getTicketPrice(getSelectedCategory(), getSelectedPackage(), period);
-      rows.push(osLine(`Registration (${pkgLabel(getSelectedPackage())})`, money(ticketCost)));
+      let ticketCost = 0;
+      if (registrationType === 'group') {
+        const b = getGroupBreakdown(period);
+        ticketCost = b.total;
+        rows.push(osLine(`Subtotal (${b.size} ${b.size === 1 ? 'person' : 'people'})`, money(b.subtotal)));
+        rows.push(osLine(`Group discount ($${GROUP_DISCOUNT_PER_PERSON} × ${b.size})`, locked ? '—' : `−$${b.discount}`));
+      } else if (registrationType === 'group-member') {
+        rows.push(osLine('Registration (covered by group lead)', '$0'));
+      } else {
+        ticketCost = getTicketPrice(getSelectedCategory(), getSelectedPackage(), period);
+        rows.push(osLine(`Registration (${pkgLabel(getSelectedPackage())})`, money(ticketCost)));
+      }
 
       // Itemise each t-shirt (colour + size), then a t-shirt subtotal line.
       if (ts.lines.length) {
@@ -1296,6 +1498,69 @@
 
     bindTicketGroup('category-group');
     bindTicketGroup('package-group');
+
+    // ── Group / individual mode ───────────────────────────────
+    // Show the right cards for the current path and refresh pricing.
+    function applyMode() {
+      const pathCard = document.getElementById('path-card');
+      const memberBanner = document.getElementById('member-banner');
+      const individualTicket = document.getElementById('individual-ticket');
+      const groupTicket = document.getElementById('group-ticket');
+      const priceBox = document.getElementById('selected-price-box');
+      const ticketCard = document.getElementById('ticket-card');
+
+      if (registrationType === 'group-member') {
+        if (pathCard) pathCard.hidden = true;
+        ticketCard.hidden = true;
+        memberBanner.hidden = false;
+        memberBanner.innerHTML = `You're joining group <strong>${activeGroupCode}</strong>. Fill in your details below — your spot is already covered by your group lead, so there's nothing to pay for registration.`;
+      } else if (registrationType === 'group') {
+        memberBanner.hidden = true;
+        ticketCard.hidden = false;
+        individualTicket.hidden = true;
+        groupTicket.hidden = false;
+        priceBox.style.display = 'none';
+      } else {
+        memberBanner.hidden = true;
+        ticketCard.hidden = false;
+        individualTicket.hidden = false;
+        groupTicket.hidden = true;
+        priceBox.style.display = 'flex';
+      }
+      updatePricingUI();
+    }
+
+    // Reveal the group path + referral inputs only once they go live (July 13).
+    if (groupReferralLive()) {
+      const pathCard = document.getElementById('path-card');
+      const referralFields = document.getElementById('referral-fields');
+      if (pathCard) pathCard.hidden = false;
+      if (referralFields) referralFields.hidden = false;
+    }
+
+    // Path selector (individual vs group)
+    document.querySelectorAll('#path-group .ticket').forEach(t => {
+      t.addEventListener('click', () => {
+        document.querySelectorAll('#path-group .ticket').forEach(x => x.classList.remove('selected'));
+        t.classList.add('selected');
+        t.querySelector('input').checked = true;
+        registrationType = t.dataset.path === 'group' ? 'group' : 'individual';
+        applyMode();
+      });
+    });
+
+    // Group quantity steppers
+    document.querySelectorAll('.qty-stepper button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const input = document.getElementById(btn.dataset.qty);
+        const step = parseInt(btn.dataset.step, 10);
+        input.value = Math.max(0, (parseInt(input.value, 10) || 0) + step);
+        updatePricingUI();
+      });
+    });
+    document.querySelectorAll('#group-ticket input[type=number]').forEach(input => {
+      input.addEventListener('input', updatePricingUI);
+    });
 
     // T-shirt: build the colour/size grid, then wire the order toggle + inputs.
     buildTshirtMatrix();
@@ -1337,7 +1602,7 @@
       });
     }
 
-    updatePricingUI();
+    applyMode();
 
     function getVal(name) {
       const el = document.querySelector(`[name="${name}"]`);
@@ -1398,6 +1663,8 @@
         travelItinerary: getVal('travelItinerary'),
         dietary: getVal('dietary'),
         referral: getVal('referral'),
+        referredByName: getVal('referredByName'),
+        referredByEmail: getVal('referredByEmail'),
         notes: getVal('notes'),
         marketingOptIn: wantsUpdates,
         groupName: '',
@@ -1428,6 +1695,11 @@
         category: info.category || '',
         ref: info.ref || info.name || '',
       });
+      // Group leads carry extra context so the payment page can show the group
+      // total, a shareable link, and the email-invite box.
+      if (info.registrationType) params.set('registrationType', info.registrationType);
+      if (info.groupCode) params.set('groupCode', info.groupCode);
+      if (info.baseUrl) params.set('baseUrl', info.baseUrl);
       window.location.href = `${PAYMENT_PAGE}?${params.toString()}`;
     }
 
@@ -1451,15 +1723,19 @@
       if (!getVal('dietary')) { setError('f-dietary', true); valid = false; }
       if (!getVal('travelMode')) { setError('f-travel', true); valid = false; }
 
-      // Category-specific required fields.
-      if (getSelectedCategory() === 'student') {
-        if (!getVal('major'))          { setError('f-major', true);      valid = false; }
-        if (!getVal('university'))     { setError('f-university', true); valid = false; }
-        if (!getVal('studentProgram')) { setError('f-program', true);    valid = false; }
-      } else {
-        if (!getVal('jobTitle')) { setError('f-jobtitle', true); valid = false; }
-        if (!getVal('company'))  { setError('f-company', true);  valid = false; }
-        if (!getVal('industry')) { setError('f-industry', true); valid = false; }
+      // Category-specific fields only apply to an individual registrant. A group
+      // lead picks quantities (not one category); a member's spot is covered, so
+      // neither fills the student/professional detail fields.
+      if (registrationType === 'individual') {
+        if (getSelectedCategory() === 'student') {
+          if (!getVal('major'))          { setError('f-major', true);      valid = false; }
+          if (!getVal('university'))     { setError('f-university', true); valid = false; }
+          if (!getVal('studentProgram')) { setError('f-program', true);    valid = false; }
+        } else {
+          if (!getVal('jobTitle')) { setError('f-jobtitle', true); valid = false; }
+          if (!getVal('company'))  { setError('f-company', true);  valid = false; }
+          if (!getVal('industry')) { setError('f-industry', true); valid = false; }
+        }
       }
       if (!document.getElementById('terms').checked) {
         showStatus('Please accept the terms & conditions to continue.', 'error');
@@ -1471,12 +1747,14 @@
       if (period === 'not-open') { showStatus('Registration opens on June 22, 2026.', 'error'); return; }
       if (period === 'closed') { showStatus('Registration has closed. Contact us if you need assistance.', 'error'); return; }
 
+      // Group leads must reach the minimum head count.
+      if (registrationType === 'group' && getGroupSize() < GROUP_MIN) {
+        showStatus(`Groups need at least ${GROUP_MIN} people. Add more to continue.`, 'error');
+        return;
+      }
+
       const fullName = `${getVal('firstName')} ${getVal('lastName')}`;
-      const category = getSelectedCategory();
-      const pkg = getSelectedPackage();
       const tshirt = getTshirtData();
-      const price = getTicketPrice(category, pkg, period);
-      const total = price + tshirt.total;
 
       // Honeypot: a real user can't see or focus the hidden "website" field,
       // so if it has a value the submission is almost certainly a bot. Send
@@ -1491,24 +1769,61 @@
         return;
       }
 
-      const payload = basePayload({
-        registrationType: 'individual',
-        regTicketType: category === 'student' ? 'Student' : 'Professional',
-        ticket: formatTicketLabel(category, pkg, period, price),
-        ticketBeforeDiscount: price,
-        ticketDiscount: 0,
-        ticketAfterDiscount: price,
-        amountDue: total,
-        ticketLines: getTicketLines(period),
-      });
+      // Build the payload + payment hand-off for the chosen path.
+      let payload, amount, category;
+      if (registrationType === 'group') {
+        const b = getGroupBreakdown(period);
+        amount = b.total + tshirt.total;
+        category = '';   // group leads don't upload a single student ID
+        payload = basePayload({
+          registrationType: 'group-lead',
+          regTicketType: 'Group',
+          ticket: `Group lead — ${getGroupCountsLabel()}`,
+          groupSize: b.size,
+          ticketBeforeDiscount: b.subtotal,
+          ticketDiscount: b.discount,
+          ticketAfterDiscount: b.total,
+          amountDue: amount,
+          ticketLines: getTicketLines(period),
+        });
+      } else if (registrationType === 'group-member') {
+        amount = tshirt.total;
+        category = '';   // registration covered by the lead; no student ID here
+        payload = basePayload({
+          registrationType: 'group-member',
+          regTicketType: 'Group member',
+          ticket: 'Group member (covered by lead)',
+          groupCode: activeGroupCode,
+          ticketBeforeDiscount: 0,
+          ticketDiscount: 0,
+          ticketAfterDiscount: 0,
+          amountDue: amount,
+          ticketLines: [],
+        });
+      } else {
+        category = getSelectedCategory();
+        const pkg = getSelectedPackage();
+        const price = getTicketPrice(category, pkg, period);
+        amount = price + tshirt.total;
+        payload = basePayload({
+          registrationType: 'individual',
+          regTicketType: category === 'student' ? 'Student' : 'Professional',
+          ticket: formatTicketLabel(category, pkg, period, price),
+          ticketBeforeDiscount: price,
+          ticketDiscount: 0,
+          ticketAfterDiscount: price,
+          amountDue: amount,
+          ticketLines: getTicketLines(period),
+        });
+      }
 
       const btn = document.getElementById('submit-btn');
       btn.disabled = true;
       btn.textContent = 'Submitting…';
 
-      // Readable POST (text/plain avoids a CORS preflight the Apps Script
-      // can't answer) so we can read back the server-assigned Registration ID.
-      let regId = '';
+      // Readable POST (text/plain avoids a CORS preflight the Apps Script can't
+      // answer) so we can read back the Registration ID and assigned group code.
+      let regId = '', groupCode = '';
       try {
         const res = await fetch(APPS_SCRIPT_URL, {
           method: 'POST',
@@ -1517,19 +1832,31 @@
         });
         const json = await res.json();
         regId = (json && json.registrationId) ? String(json.registrationId) : '';
+        groupCode = (json && json.groupCode) ? String(json.groupCode) : '';
       } catch (readErr) {
-        // The row is saved server-side; we just couldn't read the ID back.
-        // The payment page still works without it (it falls back to the name).
-        regId = '';
+        // The row is saved server-side; we just couldn't read the response back.
+        regId = ''; groupCode = '';
       }
+
+      // A group member who owes nothing (no t-shirt) has no payment step.
+      if (registrationType === 'group-member' && amount <= 0) {
+        window.location.href = 'omc-thankyou.html';
+        return;
+      }
+
+      const activeCode = (registrationType === 'group') ? groupCode : activeGroupCode;
+      const ref = activeCode ? `${activeCode} ${fullName}`.trim() : fullName;
 
       goToPayment({
         regId: regId,
-        amount: total,
+        amount: amount,
         name: fullName,
         email: email,
         category: category,
-        ref: fullName,
+        ref: ref,
+        registrationType: (registrationType === 'group') ? 'group-lead' : registrationType,
+        groupCode: activeCode || '',
+        baseUrl: (registrationType === 'group') ? (location.origin + location.pathname) : '',
       });
     }
   </script>

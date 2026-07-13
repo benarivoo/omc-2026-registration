@@ -122,6 +122,11 @@ function doPost(e) {
       return handlePaymentSubmission_(data);
     }
 
+    // Group lead emailing the join link to members (from omc-payment.html).
+    if (data.action === 'invite') {
+      return handleGroupInvite_(data);
+    }
+
     // Honeypot: the form's hidden "website" field must stay empty. A value
     // here means a bot posted directly to this URL — drop it silently but
     // return success so the bot doesn't retry.
@@ -800,16 +805,132 @@ function getSheet_() {
 }
 
 function ensureHeader_(sheet) {
+  var headers = COLUMNS.map(function (col) { return col.header; });
+
+  // Brand-new (empty) sheet: write the full header row once.
   if (sheet.getLastRow() === 0) {
-    var headers = COLUMNS.map(function (col) { return col.header; });
     sheet.appendRow(headers);
     sheet.getRange(1, 1, 1, headers.length).setFontWeight('bold');
     sheet.setFrozenRows(1);
+    return;
   }
+
+  // Self-heal: rows are appended positionally by COLUMNS order, but the header
+  // row is only ever written once (when the sheet was first created). So columns
+  // added to COLUMNS later — e.g. "Referred by (name/email)" — never got a header
+  // label on an already-populated sheet. If row 1 doesn't already match the full
+  // COLUMNS header list, rewrite it so every column is labelled correctly.
+  var width = Math.max(sheet.getLastColumn(), headers.length);
+  var current = sheet.getRange(1, 1, 1, width).getValues()[0];
+  var needsFix = false;
+  for (var i = 0; i < headers.length; i++) {
+    if (current[i] !== headers[i]) { needsFix = true; break; }
+  }
+  if (needsFix) {
+    sheet.getRange(1, 1, 1, headers.length).setValues([headers]).setFontWeight('bold');
+    sheet.setFrozenRows(1);
+  }
+}
+
+/**
+ * Run this once from the Apps Script editor (select reconcileHeaders ▸ Run) to
+ * add any missing column headers (e.g. the referral columns) to an existing
+ * Registrations sheet without waiting for the next registration to come in.
+ */
+function reconcileHeaders() {
+  ensureHeader_(getSheet_());
 }
 
 function jsonOutput_(obj) {
   return ContentService
     .createTextOutput(JSON.stringify(obj))
     .setMimeType(ContentService.MimeType.JSON);
+}
+
+/**
+ * A group lead sending the join link to their members (action: 'invite' from
+ * omc-payment.html). Emails each valid address the group link; members register
+ * their own details and pay nothing for registration. Returns how many were sent.
+ */
+function handleGroupInvite_(data) {
+  var groupCode = data.groupCode || '';
+  var leadName = data.leadName || '';
+  var emails = (data.emails && data.emails.length) ? data.emails : [];
+  if (!groupCode || !emails.length) {
+    return jsonOutput_({ result: 'error', message: 'Missing group code or email addresses.' });
+  }
+
+  var base = data.baseUrl || (siteDir_('') + 'omc-registration.html');
+  var link = base + '?group=' + encodeURIComponent(groupCode);
+
+  var sent = 0;
+  emails.forEach(function (raw) {
+    var to = String(raw == null ? '' : raw).trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)) return;
+    try {
+      MailApp.sendEmail({
+        to: to,
+        subject: (leadName ? (leadName + ' invited you to ') : ('You\'re invited to ')) + EVENT_NAME,
+        body: buildInviteText_(leadName, groupCode, link),
+        htmlBody: buildInviteHtml_(leadName, groupCode, link),
+        name: EVENT_NAME,
+        replyTo: REPLY_TO
+      });
+      sent++;
+    } catch (mailErr) {
+      // Skip this address and continue with the rest.
+    }
+  });
+
+  return jsonOutput_({ result: 'success', sent: sent });
+}
+
+/** Plain-text body for the group invite email. */
+function buildInviteText_(leadName, groupCode, link) {
+  var who = leadName ? leadName : 'A friend';
+  var lines = [];
+  lines.push('Hi there,');
+  lines.push('');
+  lines.push(who + ' has registered a group for the Overseas Mission Conference (OMC) 2026 and saved a place for you.');
+  lines.push('');
+  lines.push('The good news: your conference registration is already covered as part of the group — there is nothing to pay to register. All you need to do is fill in your own details so we can plan for you.');
+  lines.push('');
+  lines.push('Join your group here:');
+  lines.push('  ' + link);
+  lines.push('');
+  lines.push('A few notes:');
+  lines.push('  - Your spot is reserved under group ' + groupCode + '.');
+  lines.push('  - The form takes just a couple of minutes — contact details, dietary needs, and travel plans.');
+  lines.push('  - Would you like an OMC 2026 t-shirt? You can add one at the end (that is the only optional cost).');
+  lines.push('');
+  lines.push('We can\'t wait to see you there.');
+  lines.push('');
+  lines.push('Warmly,');
+  lines.push('The ' + EVENT_NAME + ' Team');
+  lines.push('Fellowship of Indonesian Christians in America');
+  return lines.join('\n');
+}
+
+/** HTML body for the group invite email (matches the confirmation email style). */
+function buildInviteHtml_(leadName, groupCode, link) {
+  var esc = function (s) {
+    return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  };
+  var who = leadName ? esc(leadName) : 'A friend';
+  var h = [];
+  h.push('<div style="font-family:Arial,Helvetica,sans-serif;color:#1a2640;max-width:520px;margin:0 auto;line-height:1.6;">');
+  h.push('<p>Hi there,</p>');
+  h.push('<p><strong>' + who + '</strong> has registered a group for the <strong>Overseas Mission Conference (OMC) 2026</strong> and saved a place for you.</p>');
+  h.push('<p>The good news: your conference registration is <strong>already covered</strong> as part of the group — there\'s nothing to pay to register. All you need to do is fill in your own details so we can plan for you.</p>');
+  h.push('<p style="text-align:center;margin:22px 0;"><a href="' + esc(link) + '" style="display:inline-block;background:#c9a84c;color:#1a2640;text-decoration:none;font-weight:bold;font-size:15px;padding:13px 30px;border-radius:999px;">Join your group &rarr;</a></p>');
+  h.push('<div style="background:#faf8f4;border:1px solid #e5e0d8;border-radius:8px;padding:14px 16px;font-size:13px;color:#1a2640;">');
+  h.push('<div style="margin-bottom:6px;">Your spot is reserved under group <strong>' + esc(groupCode) + '</strong>.</div>');
+  h.push('<div style="margin-bottom:6px;">The form takes just a couple of minutes — contact details, dietary needs, and travel plans.</div>');
+  h.push('<div>Would you like an OMC 2026 t-shirt? You can add one at the end (that\'s the only optional cost).</div>');
+  h.push('</div>');
+  h.push('<p style="font-size:12px;color:#6b7280;margin-top:12px;">If the button doesn\'t work, copy and paste this link:<br><a href="' + esc(link) + '">' + esc(link) + '</a></p>');
+  h.push('<p style="margin-top:18px;">We can\'t wait to see you there.</p>');
+  h.push('<p style="margin:0;">Warmly,<br>The ' + esc(EVENT_NAME) + ' Team<br><span style="color:#6b7280;font-size:13px;">Fellowship of Indonesian Christians in America</span></p>');
+  h.push('</div>');
+  return h.join('');
 }

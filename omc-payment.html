@@ -169,6 +169,25 @@
       color: var(--muted); border-top: 1px solid var(--border);
     }
     .footer a { color: inherit; }
+
+    /* Group lead: shareable link + email invites */
+    .share-row { display: flex; gap: 8px; margin-top: 0.5rem; }
+    .share-row input {
+      flex: 1; min-width: 0; padding: 10px 12px; font-size: 13px; color: var(--navy);
+      background: var(--cream); border: 1px solid var(--border);
+      border-radius: var(--radius); font-family: 'DM Sans', sans-serif;
+    }
+    .share-row button {
+      padding: 10px 16px; border: none; border-radius: var(--radius);
+      background: var(--navy); color: var(--white); font-family: 'DM Sans', sans-serif;
+      font-size: 13px; font-weight: 500; cursor: pointer; white-space: nowrap;
+    }
+    .share-row button:hover { background: var(--navy-light); }
+    #invite-emails {
+      width: 100%; min-height: 84px; padding: 10px 13px; font-size: 13px;
+      font-family: 'DM Sans', sans-serif; color: var(--navy); background: var(--cream);
+      border: 1px solid var(--border); border-radius: var(--radius); resize: vertical;
+    }
   </style>
 </head>
 <body>
@@ -244,6 +263,30 @@
       </div>
     </div>
 
+    <!-- Group lead only: shareable join link -->
+    <div class="card" id="share-card" hidden>
+      <p class="card-title">Step 3 — Invite your group</p>
+      <p class="intro" style="margin-bottom:1rem;">Share this link with your group members. Each person fills in their own details — their spot is already covered by your payment, so they pay nothing for registration.</p>
+      <div class="share-row">
+        <input type="text" id="share-link" readonly />
+        <button type="button" id="copy-link-btn">Copy</button>
+      </div>
+    </div>
+
+    <!-- Group lead only: send the link by email -->
+    <div class="card" id="invite-card" hidden>
+      <p class="card-title">Or send the link by email</p>
+      <p class="intro" style="margin-bottom:1rem;">Enter your members' email addresses (one per line, or separated by commas) and we'll email each of them the join link for you.</p>
+      <div class="field">
+        <label for="invite-emails">Member emails</label>
+        <textarea id="invite-emails" placeholder="alice@email.com&#10;bob@email.com"></textarea>
+      </div>
+      <div class="submit-area">
+        <button class="submit-btn" id="send-invites-btn" onclick="sendInvites()">Send invites</button>
+        <p class="submit-note" id="invite-note">We'll email each address a link to join your group.</p>
+      </div>
+    </div>
+
   </div><!-- /page-wrap -->
 
   <footer class="footer">
@@ -271,8 +314,12 @@
       email: params.get('email') || '',
       category: (params.get('category') || '').toLowerCase(),
       ref: params.get('ref') || params.get('name') || '',
+      registrationType: params.get('registrationType') || 'individual',
+      groupCode: params.get('groupCode') || '',
+      baseUrl: params.get('baseUrl') || '',
     };
     const isStudent = reg.category === 'student';
+    const isGroupLead = reg.registrationType === 'group-lead' && !!reg.groupCode;
 
     // Populate the payment instructions from the URL params.
     document.getElementById('pay-amount').textContent = `$${reg.amount}`;
@@ -282,6 +329,64 @@
 
     // Students must also upload an ID.
     if (isStudent) document.getElementById('f-student').hidden = false;
+
+    // Group leads get the shareable join link + email-invite box.
+    if (isGroupLead) {
+      const base = reg.baseUrl || 'omc-registration.html';
+      const link = `${base}?group=${encodeURIComponent(reg.groupCode)}`;
+      document.getElementById('share-link').value = link;
+      document.getElementById('share-card').hidden = false;
+      document.getElementById('invite-card').hidden = false;
+
+      const copyBtn = document.getElementById('copy-link-btn');
+      copyBtn.addEventListener('click', () => {
+        const input = document.getElementById('share-link');
+        input.select();
+        if (navigator.clipboard) navigator.clipboard.writeText(input.value);
+        else document.execCommand('copy');
+        copyBtn.textContent = 'Copied';
+        setTimeout(() => { copyBtn.textContent = 'Copy'; }, 1500);
+      });
+    }
+
+    // Send the group join link to a list of member emails (group lead only).
+    async function sendInvites() {
+      const raw = document.getElementById('invite-emails').value || '';
+      const emails = raw.split(/[\s,;]+/).map(e => e.trim()).filter(Boolean);
+      const valid = emails.filter(e => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e));
+      if (!valid.length) {
+        showStatus('Please enter at least one valid email address.', 'error');
+        return;
+      }
+      const btn = document.getElementById('send-invites-btn');
+      btn.disabled = true;
+      btn.textContent = 'Sending…';
+      try {
+        const base = reg.baseUrl || 'omc-registration.html';
+        const res = await fetch(APPS_SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({
+            action: 'invite',
+            groupCode: reg.groupCode,
+            baseUrl: base,
+            leadName: reg.name,
+            emails: valid,
+          }),
+        });
+        const json = await res.json();
+        if (json && json.result === 'success') {
+          showStatus(`Invites sent to ${valid.length} ${valid.length === 1 ? 'person' : 'people'}.`, 'success');
+          document.getElementById('invite-emails').value = '';
+        } else {
+          showStatus('We could not send the invites. Please try again, or share the link manually.', 'error');
+        }
+      } catch (err) {
+        showStatus('We could not send the invites. Please try again, or share the link manually.', 'error');
+      }
+      btn.disabled = false;
+      btn.textContent = 'Send invites';
+    }
 
     function setError(fieldId, show) {
       const el = document.getElementById(fieldId);
